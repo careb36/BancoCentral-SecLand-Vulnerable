@@ -1,24 +1,71 @@
-# Compiled class file
-*.class
+# Archivos y directorios de salida de construcción (generales)
+target/          # Directorio de salida por defecto de Maven
+build/           # Directorio de salida por defecto de Gradle
+out/             # Directorio de salida de compilación en IntelliJ para proyectos no Maven/Gradle
+bin/             # Otros posibles directorios de salida de compilación
 
-# Log file
-*.log
+# Archivos de paquetes y artefactos compilados
+*.class          # Archivos de clase Java compilados
+*.jar            # Archivos JAR (Java ARchive)
+*.war            # Archivos WAR (Web ARchive)
+*.ear            # Archivos EAR (Enterprise ARchive)
+*.zip            # Archivos ZIP de paquetes (si tu build los genera)
+*.tar.gz         # Archivos tar.gz de paquetes
+*.rar            # Archivos RAR de paquetes
 
-# BlueJ files
-*.ctxt
+# Archivos de logs y crash dumps
+*.log            # Archivos de log genéricos
+*.log.* # Variaciones de archivos de log (ej. .log.1, .log.2)
+hs_err_pid*.log  # Archivos de crash de la JVM
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
+# Reportes de tests
+/test-output/    # Directorio de salida de reportes de tests (ej. TestNG)
+/surefire-reports/ # Reportes de Surefire de Maven
+/failsafe-reports/ # Reportes de Failsafe de Maven
 
-# Package Files #
-*.jar
-*.war
-*.nar
-*.ear
-*.zip
-*.tar.gz
-*.rar
+# Archivos de caché y configuración de Gradle (si usas Gradle)
+.gradle/
+# Mantiene el script del wrapper de Gradle, pero ignora la distribución
+!gradle-wrapper.jar
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-replay_pid*
+# Archivos de caché y configuración de Maven Wrapper (si usas Maven)
+# Mantiene el script del wrapper de Maven, pero ignora la distribución
+.mvn/wrapper/maven-wrapper.jar
+
+# Archivos específicos de entornos de desarrollo (IDEs)
+
+# IntelliJ IDEA
+.idea/           # Directorio de metadatos del proyecto de IntelliJ
+*.iml            # Archivos de módulos de IntelliJ
+*.iws            # Antiguos archivos de espacio de trabajo de IntelliJ
+*.ipr            # Antiguos archivos de proyecto de IntelliJ
+
+# Eclipse
+.classpath       # Archivo de classpath del proyecto Eclipse
+.project         # Archivo de proyecto de Eclipse
+.settings/       # Directorio de configuración de Eclipse
+.apt_generated/  # Directorio para archivos generados por procesadores de anotaciones
+.factorypath     # Archivo para la configuración de fábricas de proyectos
+.springBeans    # Archivo específico para plugins de Spring/STS
+.sts4-cache/    # Caché de Spring Tools Suite 4
+
+# VS Code
+.vscode/         # Directorio de configuración del espacio de trabajo de VS Code
+# Descomentar las siguientes líneas si quieres versionar configuraciones específicas
+# !.vscode/settings.json
+# !.vscode/tasks.json
+# !.vscode/launch.json
+# !.vscode/extensions.json
+
+# Archivos específicos del Sistema Operativo
+.DS_Store        # Archivos ocultos de macOS para metadatos de directorios
+Thumbs.db        # Caché de miniaturas de Windows
+Desktop.ini      # Archivos de personalización de carpetas de Windows
+*.bak            # Archivos de backup genéricos
+*.tmp            # Archivos temporales genéricos
+*~               # Archivos de backup de algunos editores de texto (ej. Vim, Emacs)
+*.swp            # Archivos de swap de Vim
+*.swo            # Archivos de swap de Vim (segunda copia)
+
+# Archivos generados por Jacoco (cobertura de código)
+/jacoco/

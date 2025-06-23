@@ -1,0 +1,32 @@
+# docker-compose.yaml
+services:
+  # Servicio para la base de datos PostgreSQL
+  db:
+    image: postgres:15
+    container_name: bancocentral-db
+    environment:
+      POSTGRES_DB: bancocentral # Nombre de la base de datos
+      POSTGRES_USER: postgres   # Usuario para la base de datos
+      POSTGRES_PASSWORD: root     # Contraseña para el usuario
+    volumes:
+      - postgres-data:/var/lib/postgresql/data # Conecta el volumen para persistir datos
+    ports:
+      - "5432:5432"
+
+  # Servicio para la aplicación Spring Boot
+  app:
+    build: .
+    container_name: bancocentral-app
+    depends_on:
+      - db # Se asegura que el servicio 'db' inicie primero
+    ports:
+      - "8080:8080"
+    environment:
+      # Las credenciales AHORA COINCIDEN con las del servicio 'db'
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/bancocentral
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+
+volumes:
+  postgres-data: # El volumen nombrado se usa aquí

@@ -12,47 +12,75 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+/**
+ * AuthController handles user registration and login operations.
+ * <p>
+ * Registration endpoint creates a new user.
+ * Login endpoint performs authentication via Spring Security.
+ * </p>
+ */
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
 
+    /** Service layer for user registration and authentication logic. */
     @Autowired
     private AuthService authService;
 
+    /** Spring Security’s AuthenticationManager for custom authentication. */
     @Autowired
-    private AuthenticationManager authenticationManager; // ¡Inyectamos el gestor de Spring!
+    private AuthenticationManager authenticationManager;
 
+    /**
+     * Registers a new user.
+     * <p>
+     * Returns HTTP 201 (CREATED) with the persisted User object.
+     * </p>
+     *
+     * @param registerUserDto DTO containing username, password, email, etc.
+     * @return ResponseEntity&lt;User&gt; with CREATED status
+     */
     @PostMapping("/register")
     public ResponseEntity<User> register(@RequestBody RegisterUserDto registerUserDto) {
         User registeredUser = authService.register(registerUserDto);
         return new ResponseEntity<>(registeredUser, HttpStatus.CREATED);
     }
 
+    /**
+     * Authenticates a user and issues a JWT-like token.
+     * <p>
+     * Uses AuthenticationManager to validate credentials, then stores
+     * the resulting Authentication in the SecurityContextHolder.
+     * </p>
+     *
+     * @param loginRequestDto DTO with username and password
+     * @return 200 OK with token if successful, 401 UNAUTHORIZED otherwise
+     */
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto loginRequestDto) {
+    public ResponseEntity<LoginResponseDto> login(
+            @RequestBody LoginRequestDto loginRequestDto) {
+
         try {
-            // Le pedimos a Spring Security que autentique al usuario
+            // Authenticate using Spring Security
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             loginRequestDto.getUsername(),
                             loginRequestDto.getPassword()
                     )
             );
-
+            // Store auth result in the security context
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            // Si la línea anterior no lanzó una excepción, el login es correcto
+            // Simulate a JWT token generation
             String token = "simulated.jwt.token.for." + loginRequestDto.getUsername();
-            return ResponseEntity.ok(new LoginResponseDto("Login exitoso", token));
+            LoginResponseDto response = new LoginResponseDto("Login successful", token);
+            return ResponseEntity.ok(response);
 
-        } catch (Exception e) {
-            // Si la autenticación falla, Spring lanza una excepción que capturamos aquí
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        } catch (Exception ex) {
+            // Return 401 if authentication fails
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
 }

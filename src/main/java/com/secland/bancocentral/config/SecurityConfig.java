@@ -12,37 +12,72 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+/**
+ * SecurityConfig sets up Spring Security for the application:
+ * - Configures how users are authenticated.
+ * - Defines authorization rules for API endpoints.
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
+    /**
+     * CustomUserDetailsService loads user-specific data for authentication.
+     */
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
 
+    /**
+     * Defines a BCryptPasswordEncoder bean for hashing passwords securely.
+     *
+     * @return an instance of BCryptPasswordEncoder
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Configures the AuthenticationManager to use the custom UserDetailsService
+     * and the password encoder defined above.
+     *
+     * @param http the HttpSecurity to build upon (unused directly here)
+     * @return a fully configured AuthenticationManager
+     * @throws Exception if an error occurs during configuration
+     */
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
-        AuthenticationManagerBuilder authenticationManagerBuilder =
+        AuthenticationManagerBuilder authBuilder =
                 http.getSharedObject(AuthenticationManagerBuilder.class);
-        authenticationManagerBuilder
+        authBuilder
                 .userDetailsService(customUserDetailsService)
                 .passwordEncoder(passwordEncoder());
-        return authenticationManagerBuilder.build();
+        return authBuilder.build();
     }
 
+    /**
+     * Defines the security filter chain:
+     * - Disables CSRF protection (suitable for stateless REST APIs).
+     * - Permits all requests to /api/auth/** (registration and login).
+     * - Requires authentication for any other request.
+     *
+     * @param http the HttpSecurity to configure
+     * @return the SecurityFilterChain
+     * @throws Exception if an error occurs while building the chain
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable())
+        http
+                // Disable CSRF since our API is stateless
+                .csrf(csrf -> csrf.disable())
+                // Define authorization rules
                 .authorizeHttpRequests(auth -> auth
-                        // Permite el acceso sin autenticación a los endpoints de registro y login
+                        // Allow unauthenticated access to authentication endpoints
                         .requestMatchers("/api/auth/**").permitAll()
-                        // Cualquier otra petición requiere autenticación
+                        // All other endpoints require authentication
                         .anyRequest().authenticated()
                 );
+
         return http.build();
     }
 }

@@ -1,83 +1,78 @@
-# Archivos y directorios de salida de construcción (generales)
-target/          # Directorio de salida por defecto de Maven
-build/           # Directorio de salida por defecto de Gradle
-out/             # Directorio de salida de compilación en IntelliJ para proyectos no Maven/Gradle
-bin/             # Otros posibles directorios de salida de compilación
+# --------------------------------------
+# Compiled output & build directories
+# --------------------------------------
+target/           # Maven default build output :contentReference[oaicite:0]{index=0}
+build/            # Gradle default build output :contentReference[oaicite:1]{index=1}
+out/              # IntelliJ non-Maven/Gradle output
+bin/              # Other build binaries
 
-# IDEs
-.idea/
-*.iml
-.vscode/
+# --------------------------------------
+# Package & archive files
+# --------------------------------------
+*.class           # Java bytecode :contentReference[oaicite:2]{index=2}
+*.jar             # Java archives
+*.war             # Web archives
+*.ear             # Enterprise archives
+*.zip             # Distribution packages
+*.tar.gz          # Compressed archives
+*.rar             # Compressed archives
 
-# Build
-target/
-build/
+# --------------------------------------
+# Logs & diagnostic dumps
+# --------------------------------------
+*.log             # Application logs
+*.log.*           # Rotated logs (e.g., .log.1) :contentReference[oaicite:3]{index=3}
+hs_err_pid*.log   # JVM crash dumps
 
-# SO
-.DS_Store
+# --------------------------------------
+# Test reports
+# --------------------------------------
+/surefire-reports/    # Maven Surefire :contentReference[oaicite:4]{index=4}
+/failsafe-reports/    # Maven Failsafe
+/test-output/         # Generic test outputs
 
-# Archivos de paquetes y artefactos compilados
-*.class          # Archivos de clase Java compilados
-*.jar            # Archivos JAR (Java ARchive)
-*.war            # Archivos WAR (Web ARchive)
-*.ear            # Archivos EAR (Enterprise ARchive)
-*.zip            # Archivos ZIP de paquetes (si tu build los genera)
-*.tar.gz         # Archivos tar.gz de paquetes
-*.rar            # Archivos RAR de paquetes
-
-# Archivos de logs y crash dumps
-*.log            # Archivos de log genéricos
-*.log.* # Variaciones de archivos de log (ej. .log.1, .log.2)
-hs_err_pid*.log  # Archivos de crash de la JVM
-
-# Reportes de tests
-/test-output/    # Directorio de salida de reportes de tests (ej. TestNG)
-/surefire-reports/ # Reportes de Surefire de Maven
-/failsafe-reports/ # Reportes de Failsafe de Maven
-
-# Archivos de caché y configuración de Gradle (si usas Gradle)
-.gradle/
-# Mantiene el script del wrapper de Gradle, pero ignora la distribución
-!gradle-wrapper.jar
-
-# Archivos de caché y configuración de Maven Wrapper (si usas Maven)
-# Mantiene el script del wrapper de Maven, pero ignora la distribución
-.mvn/wrapper/maven-wrapper.jar
-
-# Archivos específicos de entornos de desarrollo (IDEs)
-
+# --------------------------------------
+# IDE & editor files
+# --------------------------------------
 # IntelliJ IDEA
-.idea/           # Directorio de metadatos del proyecto de IntelliJ
-*.iml            # Archivos de módulos de IntelliJ
-*.iws            # Antiguos archivos de espacio de trabajo de IntelliJ
-*.ipr            # Antiguos archivos de proyecto de IntelliJ
+.idea/             # Project metadata :contentReference[oaicite:5]{index=5}
+*.iml              # Module files
 
 # Eclipse
-.classpath       # Archivo de classpath del proyecto Eclipse
-.project         # Archivo de proyecto de Eclipse
-.settings/       # Directorio de configuración de Eclipse
-.apt_generated/  # Directorio para archivos generados por procesadores de anotaciones
-.factorypath     # Archivo para la configuración de fábricas de proyectos
-.springBeans    # Archivo específico para plugins de Spring/STS
-.sts4-cache/    # Caché de Spring Tools Suite 4
+.classpath         # Project classpath
+.project           # Project settings
+.settings/         # Project-specific settings :contentReference[oaicite:6]{index=6}
+.apt_generated/    # Annotation processor outputs
+.factorypath       # Eclipse factory path
+.springBeans       # Spring IDE metadata
+.sts4-cache/       # STS 4 cache
 
 # VS Code
-.vscode/         # Directorio de configuración del espacio de trabajo de VS Code
-# Descomentar las siguientes líneas si quieres versionar configuraciones específicas
+.vscode/           # Workspace settings :contentReference[oaicite:7]{index=7}
+# Uncomment below to track specific VS Code settings
 # !.vscode/settings.json
-# !.vscode/tasks.json
 # !.vscode/launch.json
-# !.vscode/extensions.json
 
-# Archivos específicos del Sistema Operativo
-.DS_Store        # Archivos ocultos de macOS para metadatos de directorios
-Thumbs.db        # Caché de miniaturas de Windows
-Desktop.ini      # Archivos de personalización de carpetas de Windows
-*.bak            # Archivos de backup genéricos
-*.tmp            # Archivos temporales genéricos
-*~               # Archivos de backup de algunos editores de texto (ej. Vim, Emacs)
-*.swp            # Archivos de swap de Vim
-*.swo            # Archivos de swap de Vim (segunda copia)
+# --------------------------------------
+# Maven & Gradle wrapper
+# --------------------------------------
+.mvn/wrapper/maven-wrapper.jar       # Maven Wrapper (keep) :contentReference[oaicite:8]{index=8}
+# .gradle/                            # Gradle cache (ignored)
+!gradle-wrapper.jar                  # Gradle Wrapper jar
 
-# Archivos generados por Jacoco (cobertura de código)
-/jacoco/
+# --------------------------------------
+# OS-specific files
+# --------------------------------------
+.DS_Store         # macOS metadata :contentReference[oaicite:9]{index=9}
+Thumbs.db         # Windows Explorer thumbnails
+Desktop.ini       # Windows folder settings
+*.bak             # Backup files
+*.tmp             # Temp files
+*~                # Editor backup files
+*.swp             # Vim swap files
+*.swo             # Vim swap files
+
+# --------------------------------------
+# Coverage & profiling
+# --------------------------------------
+/jacoco/          # JaCoCo code coverage :contentReference[oaicite:10]{index=10}

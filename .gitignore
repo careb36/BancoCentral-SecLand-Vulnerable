@@ -4,6 +4,18 @@ build/           # Directorio de salida por defecto de Gradle
 out/             # Directorio de salida de compilación en IntelliJ para proyectos no Maven/Gradle
 bin/             # Otros posibles directorios de salida de compilación
 
+# IDEs
+.idea/
+*.iml
+.vscode/
+
+# Build
+target/
+build/
+
+# SO
+.DS_Store
+
 # Archivos de paquetes y artefactos compilados
 *.class          # Archivos de clase Java compilados
 *.jar            # Archivos JAR (Java ARchive)

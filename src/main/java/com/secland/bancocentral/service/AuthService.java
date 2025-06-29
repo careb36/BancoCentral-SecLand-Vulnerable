@@ -1,31 +1,30 @@
 package com.secland.bancocentral.service;
 
+import com.secland.bancocentral.dto.LoginRequestDto;
 import com.secland.bancocentral.dto.RegisterUserDto;
 import com.secland.bancocentral.model.User;
 
 /**
- * Defines authentication-related operations.
- * <p>
- * Implementations of this interface handle user registration
- * and, in a fuller implementation, could also manage login,
- * token issuance, and password reset workflows.
- * </p>
+ * Service interface defining the contract for authentication-related operations,
+ * such as user registration and login.
  */
 public interface AuthService {
 
     /**
-     * Registers a new user based on the provided registration data.
-     * <p>
-     * The implementation should:
-     * <ul>
-     *   <li>Validate the incoming DTO (e.g., check for required fields, unique username).</li>
-     *   <li>Hash the raw password before storage.</li>
-     *   <li>Persist the new User entity and return the managed instance.</li>
-     * </ul>
-     * </p>
+     * Registers a new user in the system, persisting the user entity after processing the registration details.
      *
-     * @param registerUserDto the DTO containing username, full name, and raw password
-     * @return the persisted {@link User} with an assigned ID
+     * @param registerUserDto the DTO containing data for the new user (username, password, full name, etc.)
+     * @return the created {@link User} entity
      */
     User register(RegisterUserDto registerUserDto);
+
+    /**
+     * Authenticates a user using the provided login credentials.
+     *
+     * @param loginRequest the DTO containing the username and password for login
+     * @return the authenticated {@link User} entity if credentials are valid
+     * @throws RuntimeException if authentication fails or credentials are invalid
+     */
+    User login(LoginRequestDto loginRequest);
+
 }

@@ -4,35 +4,21 @@ import com.secland.bancocentral.dto.TransferRequestDto;
 import com.secland.bancocentral.model.Transaction;
 
 /**
- * Service interface defining the contract for money transfer operations.
+ * Service interface for handling financial transactions between accounts.
  * <p>
- * Implementations should ensure transactional integrity when performing fund
- * transfers between accounts. Business logic vulnerabilities (e.g., IDOR,
- * missing balance checks) may be deliberately included for testing purposes
- * in the vulnerable lab environment.
+ * Defines the contract for executing money transfers within the banking domain.
  * </p>
  */
 public interface TransactionService {
 
     /**
-     * Executes a transfer of funds from one account to another.
-     * <p>
-     * The {@code transferRequestDto} provides:
-     * <ul>
-     *   <li>{@code sourceAccountId}: ID of the account to debit</li>
-     *   <li>{@code destinationAccountId}: ID of the account to credit</li>
-     *   <li>{@code amount}: monetary amount to transfer</li>
-     *   <li>{@code description}: optional transaction memo</li>
-     * </ul>
-     * </p>
-     * <p>
-     * Returns a {@link Transaction} record reflecting the completed transfer.
-     * Implementations may throw runtime exceptions for error conditions
-     * (e.g., account not found, insufficient funds).
-     * </p>
+     * Executes a money transfer from a source account to a destination account,
+     * and persists the resulting transaction record.
      *
-     * @param transferRequestDto DTO containing transfer details
-     * @return the persisted {@link Transaction} object
+     * @param transferRequestDto the data transfer object containing transfer details
+     *                           (source and destination account IDs, amount, and optional description)
+     * @return the {@link Transaction} entity representing the completed transfer
+     * @throws RuntimeException if validation fails or any required account cannot be found
      */
     Transaction performTransfer(TransferRequestDto transferRequestDto);
 }

@@ -1,105 +1,107 @@
-# BancoCentral-SecLand-Vulnerable - Laboratorio de Hacking Ético
+# BancoCentral-SecLand-Vulnerable – Ethical Hacking Lab
 
-Este repositorio contiene el código fuente de **"Banco Central de SecLand"**, una aplicación web de banca desarrollada con Spring Boot (Java) y PostgreSQL. El propósito principal de este proyecto es servir como un **laboratorio deliberadamente vulnerable** para la investigación y práctica de hacking ético, así como para el desarrollo de un módulo de detección de anomalías basado en Inteligencia Artificial, en el contexto de un Trabajo de Fin de Máster (TFM).
+This repository contains the source code for **"Banco Central de SecLand"**, a deliberately vulnerable web banking application built with Spring Boot (Java) and PostgreSQL. The main goal of this project is to serve as a **laboratory for ethical hacking research and practice**, as well as to develop an anomaly detection module based on Artificial Intelligence (AI), as part of a Master’s Thesis (TFM).
 
-## Tabla de Contenidos
-1. [Objetivo del Proyecto](#objetivo-del-proyecto)
-2. [Características Implementadas](#características-implementadas)
-3. [Vulnerabilidades y Prácticas de Seguridad](#vulnerabilidades-y-prácticas-de-seguridad)
-4. [Tecnologías Utilizadas](#tecnologías-utilizadas)
-5. [Cómo Ponerlo en Marcha](#cómo-ponerlo-en-marcha)
-6. [Endpoints de la API](#endpoints-de-la-api)
-7. [Datos de Ejemplo](#datos-de-ejemplo)
-8. [Licencia](#licencia)
+> **Warning:** This application is deliberately vulnerable and is intended **for educational and research purposes only**. **Do not use in production or with real data.**
 
-## Objetivo del Proyecto
+## Table of Contents
+1. [Project Objective](#project-objective)
+2. [Implemented Features](#implemented-features)
+3. [Vulnerabilities and Security Practices](#vulnerabilities-and-security-practices)
+4. [Technologies Used](#technologies-used)
+5. [How to Get Started](#how-to-get-started)
+6. [API Endpoints](#api-endpoints)
+7. [Sample Data](#sample-data)
+8. [License](#license)
 
-El objetivo es proporcionar un entorno controlado para:
-* Realizar pruebas de penetración (pentesting) sobre funcionalidades bancarias comunes desde **Kali Linux**.
-* Estudiar y explotar vulnerabilidades de seguridad intencionalmente introducidas en el código y la lógica de negocio.
-* Recolectar logs detallados para el entrenamiento y validación de un modelo de IA dedicado a la detección de ataques.
-* Servir como una plataforma de investigación original para un TFM, garantizando la ausencia de "solucionarios" públicos para sus vulnerabilidades.
+## Project Objective
 
-## Características Implementadas
+This project aims to provide a controlled environment to:
+* Conduct penetration testing (pentesting) on common banking functionalities using **Kali Linux**.
+* Study and exploit security vulnerabilities intentionally introduced in both code and business logic.
+* Collect detailed logs for the training and validation of an AI-based anomaly detection model.
+* Serve as an original research platform for a Master’s Thesis, ensuring no public “solutions” exist for its vulnerabilities.
 
-* **Gestión de Usuarios:** Registro y autenticación de clientes.
-* **Gestión de Cuentas:** Creación de cuentas de Ahorros y Corriente.
-* **Transacciones:** Transferencias de fondos entre cuentas.
-* **API RESTful:** Toda la funcionalidad está expuesta a través de una API REST.
-* **Seguridad Mixta:** Combina prácticas de seguridad robustas con vulnerabilidades deliberadas.
+## Implemented Features
 
-## Vulnerabilidades y Prácticas de Seguridad
+* **User Management:** Customer registration and authentication.
+* **Account Management:** Creation of Savings and Checking accounts.
+* **Transactions:** Funds transfer between accounts.
+* **RESTful API:** All functionality is exposed through a REST API.
+* **Mixed Security:** Combines robust security practices with deliberately introduced vulnerabilities.
 
-Esta aplicación ha sido diseñada con una postura de seguridad mixta para fines de estudio.
+## Vulnerabilities and Security Practices
 
-### Vulnerabilidades Intencionales
+This application is designed with a mixed security posture for educational purposes.
 
-* **A05:2021-Broken Access Control (IDOR):** El endpoint de transferencias (`/api/accounts/transfer`) es vulnerable a **Referencia Directa Insegura a Objetos**. No valida que el usuario autenticado sea el propietario de la cuenta de origen (`sourceAccountId`), permitiendo a un atacante transferir fondos desde la cuenta de cualquier otro usuario con solo conocer su ID.
-* **Fallo de Lógica de Negocio:** La misma funcionalidad de transferencia no valida si la cuenta de origen tiene saldo suficiente, lo que permite dejar las cuentas con saldo negativo.
+### Intentional Vulnerabilities
 
-### Prácticas Seguras Implementadas (Contraejemplos)
+* **A05:2021-Broken Access Control (IDOR):** The transfer endpoint (`/api/accounts/transfer`) is vulnerable to **Insecure Direct Object Reference (IDOR)**. It does not check that the authenticated user owns the `sourceAccountId`, allowing an attacker to transfer funds from any account just by knowing its ID.
+* **Business Logic Flaw:** The transfer functionality does not validate if the source account has sufficient funds, allowing accounts to have a negative balance.
 
-* **A02:2021-Cryptographic Failures:** Para prevenir la exposición de credenciales, el sistema **no almacena contraseñas en texto plano**. Todas las contraseñas se hashean utilizando el algoritmo **BCrypt** antes de ser guardadas en la base de datos, siguiendo las mejores prácticas de la industria.
+### Secure Practices Implemented (Counterexamples)
 
-## Tecnologías Utilizadas
+* **A02:2021-Cryptographic Failures:** To prevent credential exposure, the system **does not store passwords in plain text**. All passwords are hashed using the **BCrypt** algorithm before being saved to the database, following industry best practices.
 
-* **Backend:** Java 21, Spring Boot 3, Spring Security, Spring Data JPA.
-* **Base de Datos:** PostgreSQL 15.
-* **Build Tool:** Maven.
-* **Contenerización:** Docker, Docker Compose.
-* **Testing:** JUnit 5, Postman.
-* **Plataforma de Ataque:** Kali Linux.
+## Technologies Used
 
-## Cómo Ponerlo en Marcha
+* **Backend:** Java 21, Spring Boot 3, Spring Security, Spring Data JPA
+* **Database:** PostgreSQL 15
+* **Build Tool:** Maven
+* **Containerization:** Docker, Docker Compose
+* **Testing:** JUnit 5, Postman
+* **Attack Platform:** Kali Linux
 
-El proyecto está 100% contenerizado para un despliegue fácil y rápido.
+## How to Get Started
 
-1.  **Requisitos Previos:**
-    * [Docker Desktop](https://www.docker.com/products/docker-desktop) instalado y funcionando.
-    * Un cliente Git.
+The project is fully containerized for easy and fast deployment.
 
-2.  **Clonar y Ejecutar:**
+1.  **Prerequisites:**
+    * [Docker Desktop](https://www.docker.com/products/docker-desktop) installed and running.
+    * A Git client.
+
+2.  **Clone and Run:**
     ```bash
-    # Clona este repositorio
-    git clone [https://github.com/careb36/BancoCentral-SecLand-Vulnerable.git](https://github.com/careb36/BancoCentral-SecLand-Vulnerable.git)
+    # Clone this repository
+    git clone https://github.com/careb36/BancoCentral-SecLand-Vulnerable.git
 
-    # Entra en la carpeta del proyecto
+    # Enter the project directory
     cd BancoCentral-SecLand-Vulnerable
 
-    # Levanta la aplicación y la base de datos con Docker Compose
-    # El comando --build asegura que se compile la última versión del código
+    # Launch the application and database using Docker Compose
+    # The --build flag ensures the latest version of the code is compiled
     docker-compose up --build
     ```
-    La aplicación estará disponible en `http://localhost:8080`.
+    The application will be available at `http://localhost:8080`.
 
-## Endpoints de la API
+## API Endpoints
 
-### Autenticación (`/api/auth`)
+### Authentication (`/api/auth`)
 
-* **Registrar un nuevo usuario**
+* **Register a new user**
     * **Endpoint:** `POST /api/auth/register`
     * **Body:**
         ```json
         {
-            "username": "nuevo_usuario",
-            "password": "una_clave_segura",
-            "fullName": "Nombre Apellido"
+            "username": "new_user",
+            "password": "a_secure_password",
+            "fullName": "Full Name"
         }
         ```
 
-* **Iniciar Sesión**
+* **Log in**
     * **Endpoint:** `POST /api/auth/login`
     * **Body:**
         ```json
         {
-            "username": "usuario_existente",
-            "password": "su_clave"
+            "username": "existing_user",
+            "password": "your_password"
         }
         ```
 
-### Cuentas (`/api/accounts`)
+### Accounts (`/api/accounts`)
 
-* **Realizar una transferencia**
+* **Make a transfer**
     * **Endpoint:** `POST /api/accounts/transfer`
     * **Body:**
         ```json
@@ -107,26 +109,26 @@ El proyecto está 100% contenerizado para un despliegue fácil y rápido.
             "sourceAccountId": 101,
             "destinationAccountId": 201,
             "amount": 500.00,
-            "description": "Transferencia de prueba"
+            "description": "Test transfer"
         }
         ```
 
-## Datos de Ejemplo
+## Sample Data
 
-La base de datos se inicializa con los siguientes usuarios y cuentas para facilitar las pruebas:
+The database is initialized with the following users and accounts for testing:
 
-| Entidad | ID  | Detalles                                             |
-| :------ | :-- | :--------------------------------------------------- |
-| Usuario | 1   | `username`: **carolina_p**, `password`: **password123** |
-| Usuario | 2   | `username`: **test_user**, `password`: **testpass** |
-| Cuenta  | 101 | Tipo: Ahorros, Saldo: 5000.75, Dueño: `carolina_p`    |
-| Cuenta  | 102 | Tipo: Corriente, Saldo: 1250.00, Dueño: `carolina_p`   |
-| Cuenta  | 201 | Tipo: Ahorros, Saldo: 800.50, Dueño: `test_user`      |
+| Entity  | ID  | Details                                                    |
+| :------ | :-: | :-------------------------------------------------------- |
+| User    | 1   | `username`: **carolina_p**, `password`: **password123**   |
+| User    | 2   | `username`: **test_user**, `password`: **testpass**       |
+| Account | 101 | Type: Savings, Balance: 5000.75, Owner: `carolina_p`      |
+| Account | 102 | Type: Checking, Balance: 1250.00, Owner: `carolina_p`     |
+| Account | 201 | Type: Savings, Balance: 800.50, Owner: `test_user`        |
 
-## Licencia
+## License
 
-Este proyecto se distribuye bajo la Licencia MIT. Consulta el archivo `LICENSE` para más detalles.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
 
 ---
-**¡Advertencia!** Esta aplicación es deliberadamente vulnerable y está diseñada solo para fines educativos. No la uses en entornos de producción ni con datos reales.
----
+
+> **Warning!** This application is deliberately vulnerable and is designed solely for educational purposes. Do **not** use it in production or with real data.

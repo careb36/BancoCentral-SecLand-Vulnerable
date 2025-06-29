@@ -1,11 +1,10 @@
 package com.secland.bancocentral.config;
 
 import com.secland.bancocentral.service.CustomUserDetailsService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -13,24 +12,24 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 /**
- * SecurityConfig sets up Spring Security for the application:
- * - Configures how users are authenticated.
- * - Defines authorization rules for API endpoints.
+ * Central configuration class for Spring Security.
+ * <p>
+ * Defines password encoding, authentication manager, and security filter chain,
+ * specifying how authentication and authorization are managed throughout the application.
+ * </p>
  */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
     /**
-     * CustomUserDetailsService loads user-specific data for authentication.
-     */
-    @Autowired
-    private CustomUserDetailsService customUserDetailsService;
-
-    /**
-     * Defines a BCryptPasswordEncoder bean for hashing passwords securely.
+     * Provides the global {@link PasswordEncoder} bean for the application.
+     * <p>
+     * Uses BCrypt, a strong adaptive hashing algorithm which includes a salt in every hash,
+     * mitigating the risk of rainbow table attacks and supporting security best practices for password storage.
+     * </p>
      *
-     * @return an instance of BCryptPasswordEncoder
+     * @return a {@link BCryptPasswordEncoder} instance for encoding passwords
      */
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -38,43 +37,45 @@ public class SecurityConfig {
     }
 
     /**
-     * Configures the AuthenticationManager to use the custom UserDetailsService
-     * and the password encoder defined above.
+     * Exposes Spring Security's {@link AuthenticationManager} as a bean.
+     * <p>
+     * Responsible for processing authentication requests using the configured
+     * {@link CustomUserDetailsService} and {@link PasswordEncoder}.
+     * </p>
      *
-     * @param http the HttpSecurity to build upon (unused directly here)
-     * @return a fully configured AuthenticationManager
+     * @param authenticationConfiguration the Spring Security authentication configuration
+     * @return the configured {@link AuthenticationManager} instance
      * @throws Exception if an error occurs during configuration
      */
     @Bean
-    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
-        AuthenticationManagerBuilder authBuilder =
-                http.getSharedObject(AuthenticationManagerBuilder.class);
-        authBuilder
-                .userDetailsService(customUserDetailsService)
-                .passwordEncoder(passwordEncoder());
-        return authBuilder.build();
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 
     /**
-     * Defines the security filter chain:
-     * - Disables CSRF protection (suitable for stateless REST APIs).
-     * - Permits all requests to /api/auth/** (registration and login).
-     * - Requires authentication for any other request.
+     * Configures the application's HTTP security filter chain.
+     * <p>
+     * Sets access control policies for the various API endpoints and disables CSRF for stateless REST APIs.
+     * - Permits unauthenticated access to endpoints starting with <code>/api/auth/</code> (registration, login).
+     * - Requires authentication for all other requests.
+     * </p>
      *
-     * @param http the HttpSecurity to configure
-     * @return the SecurityFilterChain
-     * @throws Exception if an error occurs while building the chain
+     * @param http the {@link HttpSecurity} object to configure
+     * @return the constructed {@link SecurityFilterChain} enforcing defined rules
+     * @throws Exception if an error occurs during security filter configuration
      */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                // Disable CSRF since our API is stateless
+                // Disables CSRF protection for stateless REST APIs (not using cookies).
                 .csrf(csrf -> csrf.disable())
-                // Define authorization rules
+
+                // Defines authorization rules for HTTP requests.
                 .authorizeHttpRequests(auth -> auth
-                        // Allow unauthenticated access to authentication endpoints
+                        // Allows public (unauthenticated) access to all endpoints under "/api/auth/".
                         .requestMatchers("/api/auth/**").permitAll()
-                        // All other endpoints require authentication
+
+                        // Requires authentication for all other endpoints (e.g., "/api/accounts/transfer").
                         .anyRequest().authenticated()
                 );
 

@@ -1,23 +1,21 @@
-# Dockerfile
-
-# Etapa 1: Construcción con Maven
-# Usamos una imagen de Maven con Java 21 para compilar el proyecto
+# Stage 1: Build with Maven
+# Use a Maven image with Java 21 to build the project
 FROM maven:3.9.6-eclipse-temurin-21 AS build
 WORKDIR /app
-# Copiamos solo el pom.xml para descargar dependencias eficientemente
+# Copy only the pom.xml to download dependencies efficiently
 COPY pom.xml .
 RUN mvn dependency:go-offline
-# Copiamos el resto del código fuente y construimos el JAR
+# Copy the rest of the source code and build the JAR
 COPY src ./src
 RUN mvn package -DskipTests
 
-# Etapa 2: Ejecución
-# Usamos una imagen más ligera solo con Java para correr la aplicación
+# Stage 2: Run the application
+# Use a lightweight Java image to run the application
 FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
-# Copiamos el JAR construido desde la etapa anterior
+# Copy the built JAR from the previous stage
 COPY --from=build /app/target/*.jar app.jar
-# Exponemos el puerto 8080 para acceder a la aplicación
+# Expose port 8080 for external access
 EXPOSE 8080
-# Comando para iniciar la aplicación al levantar el contenedor
+# Command to start the application when the container launches
 ENTRYPOINT ["java","-jar","app.jar"]

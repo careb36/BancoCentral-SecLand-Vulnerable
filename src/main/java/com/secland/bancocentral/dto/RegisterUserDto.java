@@ -6,25 +6,29 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 /**
- * Payload for new user registration.
+ * Data transfer object for new user registration requests.
  * <p>
- * Validates incoming data for user creation.
+ * Used to capture and validate input data required for creating a new user account.
  * </p>
  */
 @Data
 public class RegisterUserDto {
 
     /**
-     * Desired username for the new account.
-     * Must not be blank and between 3 and 20 characters.
+     * Desired username for the new user account.
+     * <p>
+     * This field must not be blank and must be between 3 and 20 characters in length.
+     * </p>
      */
     @NotBlank(message = "Username must not be blank")
     @Size(min = 3, max = 20, message = "Username must be between 3 and 20 characters")
     private String username;
 
     /**
-     * Password for the new account.
-     * Must not be blank and at least 8 characters for security.
+     * Password for the new user account.
+     * <p>
+     * This field must not be blank and must be at least 8 characters for security purposes.
+     * </p>
      */
     @NotBlank(message = "Password must not be blank")
     @Size(min = 8, message = "Password must be at least 8 characters")
@@ -32,13 +36,17 @@ public class RegisterUserDto {
 
     /**
      * Full name of the user.
-     * Optional but recommended for clarity in profiles.
+     * <p>
+     * This field is optional but recommended for improved clarity in user profiles and displays.
+     * </p>
      */
     private String fullName;
 
     /**
      * Email address of the user.
-     * Must follow a valid email format.
+     * <p>
+     * Must conform to a valid email format.
+     * </p>
      */
     @Email(message = "Email should be valid")
     private String email;

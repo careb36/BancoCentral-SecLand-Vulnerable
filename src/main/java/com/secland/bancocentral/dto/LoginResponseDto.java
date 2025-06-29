@@ -4,21 +4,29 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
- * Response returned after successful authentication.
+ * Data transfer object representing the response returned after a successful authentication attempt.
  * <p>
- * Contains a message and a token (e.g., JWT) for subsequent requests.
+ * Encapsulates a human-readable message and an authentication token (e.g., JWT)
+ * to be used in subsequent API requests for authorization.
  * </p>
  */
 @Data
 @AllArgsConstructor
 public class LoginResponseDto {
 
-    /** A human-readable status or success message. */
+    /**
+     * Human-readable status or success message.
+     * <p>
+     * Typically used to communicate the result of the authentication process to the client.
+     * </p>
+     */
     private String message;
 
     /**
-     * Authentication token issued after login.
-     * In a real implementation, this would be a JWT or similar.
+     * Authentication token issued upon successful login.
+     * <p>
+     * In a real-world implementation, this would be a JWT (JSON Web Token) or a similar secure token.
+     * </p>
      */
     private String token;
 }

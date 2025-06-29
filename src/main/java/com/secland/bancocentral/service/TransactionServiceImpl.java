@@ -10,43 +10,49 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 /**
- * Service implementation for handling money transfers between accounts.
- *
- * <p><strong>Intentional vulnerabilities included for security testing:</strong></p>
- * <ul>
- *   <li><strong>IDOR:</strong> No ownership verification on sourceAccountId.</li>
- *   <li><strong>Business Logic Flaw:</strong> No check for sufficient balance, allowing negative balances.</li>
- * </ul>
+ * Service implementation for handling monetary transactions between accounts.
+ * <p>
+ * <strong>Security Notice:</strong> This class intentionally includes known vulnerabilities
+ * (for example, missing ownership checks and insufficient funds validation) to facilitate
+ * security testing and educational purposes in ethical hacking scenarios.
+ * </p>
  */
 @Service
 public class TransactionServiceImpl implements TransactionService {
 
-    /** Repository for CRUD operations on Account entities. */
+    /**
+     * Repository for account entities.
+     */
     @Autowired
     private AccountRepository accountRepository;
 
-    /** Repository for CRUD operations on Transaction entities. */
+    /**
+     * Repository for transaction entities.
+     */
     @Autowired
     private TransactionRepository transactionRepository;
 
     /**
-     * Executes a funds transfer as a single atomic transaction.
+     * Executes a fund transfer from one account to another, recording the transaction.
      * <p>
-     * Debits the source account and credits the destination account,
-     * then records the transaction.
+     * <strong>Intentional Vulnerabilities:</strong>
+     * <ul>
+     *     <li><b>IDOR (Insecure Direct Object Reference):</b> This method does not verify that the authenticated user
+     *     owns the source account. Anyone with knowledge of an account ID can initiate a transfer from it.</li>
+     *     <li><b>Business Logic Flaw:</b> The method does not check if the source account has sufficient funds,
+     *     potentially allowing for overdrafts or negative balances.</li>
+     * </ul>
      * </p>
      *
-     * @param transferRequestDto details of the transfer (source, destination, amount, description)
-     * @return the saved {@link Transaction} record
-     * @throws RuntimeException if source or destination account is not found
+     * @param transferRequestDto the DTO containing transfer details (source and destination account IDs, amount, and description)
+     * @return the persisted {@link Transaction} object representing the transfer record
+     * @throws RuntimeException if the source or destination account is not found
      */
     @Override
     @Transactional
     public Transaction performTransfer(TransferRequestDto transferRequestDto) {
-        // IDOR: fetch accounts by ID without verifying user authorization
         Account sourceAccount = accountRepository.findById(transferRequestDto.getSourceAccountId())
                 .orElseThrow(() -> new RuntimeException("Source account not found"));
 
@@ -55,27 +61,19 @@ public class TransactionServiceImpl implements TransactionService {
 
         BigDecimal amount = transferRequestDto.getAmount();
 
-        // Business logic flaw: no check for sufficient funds
-        // e.g., enforce balance validation:
-        // if (sourceAccount.getBalance().compareTo(amount) < 0) {
-        //     throw new RuntimeException("Insufficient balance");
-        // }
-
-        // Perform the balance updates
+        // Subtract from source, add to destination (no sufficient funds check - intentional)
         sourceAccount.setBalance(sourceAccount.getBalance().subtract(amount));
         destinationAccount.setBalance(destinationAccount.getBalance().add(amount));
 
-        // Persist updated balances
         accountRepository.save(sourceAccount);
         accountRepository.save(destinationAccount);
 
-        // Create and record the transaction
+        // Record the transaction
         Transaction transaction = new Transaction();
         transaction.setSourceAccountId(sourceAccount.getId());
         transaction.setDestinationAccountId(destinationAccount.getId());
         transaction.setAmount(amount);
         transaction.setDescription(transferRequestDto.getDescription());
-        transaction.setTransactionDate(LocalDateTime.now());
 
         return transactionRepository.save(transaction);
     }

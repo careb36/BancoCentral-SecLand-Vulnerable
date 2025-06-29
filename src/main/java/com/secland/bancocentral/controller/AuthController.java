@@ -15,32 +15,50 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * AuthController handles user registration and login operations.
+ * REST controller handling user authentication and registration operations.
  * <p>
- * Registration endpoint creates a new user.
- * Login endpoint performs authentication via Spring Security.
+ * Provides endpoints for user registration and login, both via custom logic and Spring Security's
+ * {@link AuthenticationManager}. Endpoints are grouped under <code>/api/auth</code>.
  * </p>
  */
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    /** Service layer for user registration and authentication logic. */
+    /**
+     * Service providing authentication-related operations.
+     */
     @Autowired
     private AuthService authService;
 
-    /** Spring Security’s AuthenticationManager for custom authentication. */
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
     /**
-     * Registers a new user.
+     * Authenticates a user using the custom {@link AuthService} login logic.
      * <p>
-     * Returns HTTP 201 (CREATED) with the persisted User object.
+     * This endpoint receives a {@link LoginRequestDto} containing user credentials.
+     * On successful authentication, returns a message with the username; otherwise, returns 401 Unauthorized.
      * </p>
      *
-     * @param registerUserDto DTO containing username, password, email, etc.
-     * @return ResponseEntity&lt;User&gt; with CREATED status
+     * @param loginRequest the payload with username and password
+     * @return {@link ResponseEntity} with a success message or 401 Unauthorized if credentials are invalid
+     */
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequestDto loginRequest) {
+        try {
+            User user = authService.login(loginRequest);
+            return ResponseEntity.ok("Login successful for user: " + user.getUsername());
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+        }
+    }
+
+    /**
+     * Registers a new user in the system.
+     * <p>
+     * This endpoint receives a {@link RegisterUserDto} and returns the created {@link User} entity.
+     * </p>
+     *
+     * @param registerUserDto the payload with registration details
+     * @return {@link ResponseEntity} with the created user and HTTP 201 Created status
      */
     @PostMapping("/register")
     public ResponseEntity<User> register(@RequestBody RegisterUserDto registerUserDto) {
@@ -49,37 +67,37 @@ public class AuthController {
     }
 
     /**
-     * Authenticates a user and issues a JWT-like token.
+     * Authenticates a user using Spring Security's {@link AuthenticationManager}.
      * <p>
-     * Uses AuthenticationManager to validate credentials, then stores
-     * the resulting Authentication in the SecurityContextHolder.
+     * <strong>Note:</strong> This endpoint is provided as an alternative to the custom login endpoint,
+     * and is mapped to <code>/login-spring</code> to avoid conflicts. Simulates token generation.
      * </p>
      *
-     * @param loginRequestDto DTO with username and password
-     * @return 200 OK with token if successful, 401 UNAUTHORIZED otherwise
+     * @param loginRequestDto the payload with user credentials
+     * @return {@link ResponseEntity} with a simulated token on success, or 401 Unauthorized on failure
      */
-    @PostMapping("/login")
-    public ResponseEntity<LoginResponseDto> login(
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @PostMapping("/login-spring")
+    public ResponseEntity<LoginResponseDto> loginSpring(
             @RequestBody LoginRequestDto loginRequestDto) {
 
         try {
-            // Authenticate using Spring Security
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             loginRequestDto.getUsername(),
                             loginRequestDto.getPassword()
                     )
             );
-            // Store auth result in the security context
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            // Simulate a JWT token generation
+            // Simulated JWT token; replace with real token generation for production
             String token = "simulated.jwt.token.for." + loginRequestDto.getUsername();
             LoginResponseDto response = new LoginResponseDto("Login successful", token);
             return ResponseEntity.ok(response);
 
         } catch (Exception ex) {
-            // Return 401 if authentication fails
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }

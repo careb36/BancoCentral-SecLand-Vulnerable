@@ -4,13 +4,16 @@ import com.secland.bancocentral.model.Transaction;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
- * Repository interface for {@link Transaction} entities.
+ * Repository interface for managing {@link Transaction} entities in the persistence layer.
  * <p>
- * Enables basic CRUD operations for transfer transactions,
- * as well as paging and sorting support.
+ * Extends {@link JpaRepository} to provide CRUD operations, pagination, and sorting capabilities
+ * for financial transfer transactions.
+ * </p>
+ * <p>
+ * Custom query methods can be added here as needed, for example:
+ * <code>List&lt;Transaction&gt; findBySourceAccountId(Long accountId);</code>
  * </p>
  */
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
-    // Custom query methods can be added here if needed in the future,
-    // for example: List<Transaction> findBySourceAccountId(Long accountId);
+    // Custom query methods for transaction retrieval can be added here.
 }

@@ -127,7 +127,7 @@ The database is initialized with the following users and accounts for testing:
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
+This project is licensed under the MIT License. See the [LICENSE](https://github.com/careb36/careb36-BancoCentral-SecLand-Vulnerable/blob/main/LICENCE) file for more details.
 
 ---
 

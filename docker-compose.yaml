@@ -1,32 +1,51 @@
-version: '3.8'
+# docker-compose.yaml
 services:
-  # PostgreSQL database service
   db:
-    image: postgres:15
+    image: postgres:15.5-alpine
     container_name: bancocentral-db
+    restart: unless-stopped                   # Restart container automatically unless stopped
     environment:
-      POSTGRES_DB: bancocentral     # Name of the database
-      POSTGRES_USER: postgres       # Database user
-      POSTGRES_PASSWORD: root       # User password
+      POSTGRES_DB: ${POSTGRES_DB}             # Database name from .env
+      POSTGRES_USER: ${POSTGRES_USER}         # Username from .env
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD} # Password from .env
     volumes:
-      - postgres-data:/var/lib/postgresql/data   # Mount a volume for data persistence
+      - postgres-data:/var/lib/postgresql/data  # Persist database data
     ports:
-      - "5432:5432"
+      - "5432:5432"                            # Expose PostgreSQL port
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s                            # Check every 10 seconds
+      timeout: 5s                              # Consider unhealthy after 5 seconds
+      retries: 5                               # Retry up to 5 times
+    networks:
+      - bancocentral_net                       # Attach to custom network
 
-  # Spring Boot application service
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile                  # Use multi-stage Dockerfile
+    image: bancocentral-app:1.0.0              # Tag the built image
     container_name: bancocentral-app
     depends_on:
-      - db   # Ensures the 'db' service starts first
+      db:
+        condition: service_healthy             # Wait until the DB is healthy
+    restart: on-failure                        # Restart only on failure
     ports:
-      - "8080:8080"
+      - "8080:8080"                            # Expose application port
     environment:
-      # Credentials MUST match those of the 'db' service
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/bancocentral
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    networks:
+      - bancocentral_net
+    # Mount Maven cache for faster rebuilds in development only:
+    # volumes:
+    #   - ~/.m2:/root/.m2:ro
 
 volumes:
-  postgres-data:
+  postgres-data:                              # Named volume for PostgreSQL data
+
+networks:
+  bancocentral_net:                           # Custom bridge network for isolation
+    driver: bridge

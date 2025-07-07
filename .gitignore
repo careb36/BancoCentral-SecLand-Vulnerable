@@ -1,15 +1,15 @@
 # --------------------------------------
 # Compiled output & build directories
 # --------------------------------------
-target/           # Maven default build output :contentReference[oaicite:0]{index=0}
-build/            # Gradle default build output :contentReference[oaicite:1]{index=1}
+target/           # Maven default build output
+build/            # Gradle default build output
 out/              # IntelliJ non-Maven/Gradle output
 bin/              # Other build binaries
 
 # --------------------------------------
 # Package & archive files
 # --------------------------------------
-*.class           # Java bytecode :contentReference[oaicite:2]{index=2}
+*.class           # Java bytecode
 *.jar             # Java archives
 *.war             # Web archives
 *.ear             # Enterprise archives
@@ -21,49 +21,55 @@ bin/              # Other build binaries
 # Logs & diagnostic dumps
 # --------------------------------------
 *.log             # Application logs
-*.log.*           # Rotated logs (e.g., .log.1) :contentReference[oaicite:3]{index=3}
+*.log.*           # Rotated logs (e.g., .log.1)
 hs_err_pid*.log   # JVM crash dumps
 
 # --------------------------------------
-# Test reports
+# Test reports & coverage
 # --------------------------------------
-/surefire-reports/    # Maven Surefire :contentReference[oaicite:4]{index=4}
+/surefire-reports/    # Maven Surefire
 /failsafe-reports/    # Maven Failsafe
 /test-output/         # Generic test outputs
+/jacoco/              # JaCoCo code coverage
 
 # --------------------------------------
-# IDE & editor files
+# Environment files
+# --------------------------------------
+.env                # Environment variables file
+.env.*              # Other env variants
+
+# --------------------------------------
+# Docker-related
+# --------------------------------------
+docker-compose.override.yml   # Local override file
+*.local.yml                   # Alternate compose files
+/.docker/                     # Local Docker build/secret files
+docker-compose*.yml           # Any other compose files
+
+# --------------------------------------
+# IDE & editor metadata
 # --------------------------------------
 # IntelliJ IDEA
-.idea/             # Project metadata :contentReference[oaicite:5]{index=5}
-*.iml              # Module files
+.idea/
+*.iml
 
 # Eclipse
-.classpath         # Project classpath
-.project           # Project settings
-.settings/         # Project-specific settings :contentReference[oaicite:6]{index=6}
-.apt_generated/    # Annotation processor outputs
-.factorypath       # Eclipse factory path
-.springBeans       # Spring IDE metadata
-.sts4-cache/       # STS 4 cache
+.classpath
+.project
+.settings/
+.apt_generated/
+.factorypath
+.springBeans
+.sts4-cache/
 
 # VS Code
-.vscode/           # Workspace settings :contentReference[oaicite:7]{index=7}
-# Uncomment below to track specific VS Code settings
-# !.vscode/settings.json
-# !.vscode/launch.json
-
-# --------------------------------------
-# Maven & Gradle wrapper
-# --------------------------------------
-.mvn/wrapper/maven-wrapper.jar       # Maven Wrapper (keep) :contentReference[oaicite:8]{index=8}
-# .gradle/                            # Gradle cache (ignored)
-!gradle-wrapper.jar                  # Gradle Wrapper jar
+.vscode/
+/.vscode/*                    # Uncomment to track specific workspace settings
 
 # --------------------------------------
 # OS-specific files
 # --------------------------------------
-.DS_Store         # macOS metadata :contentReference[oaicite:9]{index=9}
+.DS_Store         # macOS metadata
 Thumbs.db         # Windows Explorer thumbnails
 Desktop.ini       # Windows folder settings
 *.bak             # Backup files
@@ -73,6 +79,12 @@ Desktop.ini       # Windows folder settings
 *.swo             # Vim swap files
 
 # --------------------------------------
-# Coverage & profiling
+# Maven & Gradle wrapper
 # --------------------------------------
-/jacoco/          # JaCoCo code coverage :contentReference[oaicite:10]{index=10}
+.mvn/wrapper/maven-wrapper.jar   # Maven Wrapper binary
+!gradle-wrapper.jar              # Keep Gradle Wrapper jar tracked
+
+# --------------------------------------
+# Local Maven repository (uncomment if accidentally checked in)
+# --------------------------------------
+/root/.m2/

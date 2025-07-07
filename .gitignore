@@ -53,6 +53,11 @@ docker-compose*.yml           # Any other compose files
 .idea/
 *.iml
 
+# --------------------------------------
+# Any other IDE metadata you don’t want in GitHub
+# --------------------------------------
+bancocentral.iml
+
 # Eclipse
 .classpath
 .project

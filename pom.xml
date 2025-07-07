@@ -5,8 +5,8 @@
   for ethical hacking labs and AI-based anomaly detection research.
   For educational and research purposes only.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <!-- Maven POM model version -->
     <modelVersion>4.0.0</modelVersion>
@@ -24,7 +24,8 @@
     <artifactId>bancocentral</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>BancoCentral SecLand</name>
-    <description>Deliberately vulnerable banking application for ethical hacking and AI research (Master's Thesis).</description>
+    <description>Deliberately vulnerable banking application for ethical hacking and AI research (Master's Thesis).
+    </description>
     <url>https://github.com/careb36/BancoCentral-SecLand-Vulnerable</url>
 
     <!-- Metadata: licenses, developers, and SCM (optional, can be customized) -->
@@ -37,7 +38,7 @@
     <developers>
         <developer>
             <name>Carolina Pereira Palomeque</name>
-            <email>your-email@example.com</email>
+            <email>carolina.pereira.palomeque@gmail.com</email>
         </developer>
     </developers>
     <scm>
@@ -58,6 +59,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.flywaydb</groupId>
+                    <artifactId>flyway-core</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

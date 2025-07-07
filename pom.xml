@@ -20,10 +20,10 @@
     </parent>
 
     <!-- Project coordinates and metadata -->
-    <groupId>com.seclandia.bancocentral</groupId>
-    <artifactId>bancocentral</artifactId>
+    <groupId>com.secland.centralbank</groupId>
+    <artifactId>centralbank-secland-vulnerable</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>BancoCentral SecLand</name>
+    <name>CentralBank-SecLand-Vulnerable</name>
     <description>Deliberately vulnerable banking application for ethical hacking and AI research (Master's Thesis).
     </description>
     <url>https://github.com/careb36/BancoCentral-SecLand-Vulnerable</url>

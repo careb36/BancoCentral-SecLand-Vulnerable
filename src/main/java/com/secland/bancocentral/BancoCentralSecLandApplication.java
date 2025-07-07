@@ -1,8 +1,8 @@
 package com.secland.bancocentral;
 
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration;
 
 /**
  * Main entry point for the BancoCentral–SecLand application.
@@ -13,7 +13,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * This class is the root of the application's execution and lifecycle management.
  * </p>
  */
-@SpringBootApplication
+@SpringBootApplication(
+		exclude = FlywayAutoConfiguration.class
+)
 public class BancoCentralSecLandApplication {
 
 	/**

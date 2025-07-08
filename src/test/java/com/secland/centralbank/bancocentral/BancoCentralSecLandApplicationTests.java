@@ -1,4 +1,4 @@
-package com.secland.bancocentral.bancocentral;
+package com.secland.centralbank.bancocentral;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

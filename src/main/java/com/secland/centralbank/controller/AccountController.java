@@ -1,11 +1,14 @@
-package com.secland.bancocentral.controller;
+package com.secland.centralbank.controller;
 
-import com.secland.bancocentral.dto.TransferRequestDto;
-import com.secland.bancocentral.model.Transaction;
-import com.secland.bancocentral.service.TransactionService;
+import com.secland.centralbank.dto.TransactionHistoryDto;
+import com.secland.centralbank.dto.TransferRequestDto;
+import com.secland.centralbank.model.Transaction;
+import com.secland.centralbank.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * REST controller exposing endpoints for account-related operations.
@@ -53,6 +56,36 @@ public class AccountController {
             return ResponseEntity.ok(transaction);
         } catch (RuntimeException e) {
             // Return a clear 400 response on errors such as "Account not found" or business rule violations
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    /**
+     * Retrieves transaction history for a specific account.
+     * <p>
+     * <strong>Intentional Vulnerability (IDOR):</strong> This endpoint does not verify that
+     * the authenticated user owns the specified account. Any authenticated user can retrieve
+     * transaction history for any account by providing the account ID in the URL path.
+     * </p>
+     * <p>
+     * <strong>Intentional Vulnerability (Stored XSS):</strong> The returned transaction data
+     * includes raw description fields that may contain malicious scripts stored from previous
+     * transfer operations. When rendered by a front-end without proper encoding, this could
+     * lead to stored XSS attacks.
+     * </p>
+     *
+     * @param accountId the ID of the account to retrieve transaction history for
+     * @return ResponseEntity containing a list of TransactionHistoryDto with transaction details
+     */
+    @GetMapping("/{accountId}/transactions")
+    public ResponseEntity<List<TransactionHistoryDto>> getTransactionHistory(
+            @PathVariable Long accountId) {
+        
+        try {
+            // VULNERABILITY: No authorization check - any user can access any account's transactions
+            List<TransactionHistoryDto> transactions = transactionService.getTransactionHistory(accountId);
+            return ResponseEntity.ok(transactions);
+        } catch (RuntimeException e) {
             return ResponseEntity.badRequest().build();
         }
     }

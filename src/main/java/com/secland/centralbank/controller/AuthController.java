@@ -1,10 +1,10 @@
-package com.secland.bancocentral.controller;
+package com.secland.centralbank.controller;
 
-import com.secland.bancocentral.dto.LoginRequestDto;
-import com.secland.bancocentral.dto.LoginResponseDto;
-import com.secland.bancocentral.dto.RegisterUserDto;
-import com.secland.bancocentral.model.User;
-import com.secland.bancocentral.service.AuthService;
+import com.secland.centralbank.dto.LoginRequestDto;
+import com.secland.centralbank.dto.LoginResponseDto;
+import com.secland.centralbank.dto.RegisterUserDto;
+import com.secland.centralbank.model.User;
+import com.secland.centralbank.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

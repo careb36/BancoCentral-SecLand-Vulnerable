@@ -1,4 +1,4 @@
-package com.secland.bancocentral.dto;
+package com.secland.centralbank.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

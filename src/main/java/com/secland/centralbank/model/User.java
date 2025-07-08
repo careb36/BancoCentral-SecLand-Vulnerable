@@ -1,4 +1,4 @@
-package com.secland.bancocentral.model;
+package com.secland.centralbank.model;
 
 import jakarta.persistence.*;
 import lombok.Data;

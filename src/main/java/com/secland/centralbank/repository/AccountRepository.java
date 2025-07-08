@@ -1,6 +1,6 @@
-package com.secland.bancocentral.repository;
+package com.secland.centralbank.repository;
 
-import com.secland.bancocentral.model.Account;
+import com.secland.centralbank.model.Account;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**

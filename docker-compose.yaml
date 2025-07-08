@@ -1,13 +1,23 @@
+# =====================================================================
 # docker-compose.yaml
+# CentralBank SecLand - Complete Three-Tier Architecture
+# =====================================================================
+# Purpose:
+#   - Orchestrates the complete banking application stack
+#   - Database (PostgreSQL) + Backend (Spring Boot) + Frontend (Nginx)
+#   - Professional containerized setup with health checks and networking
+# =====================================================================
+
 services:
+  # ===================================================================
+  # DATABASE TIER - PostgreSQL Database
+  # ===================================================================
   db:
     image: postgres:15-alpine
-    container_name: secland_bank_db # Standardized container name
+    container_name: secland_bank_db
     environment:
-      # We define the database name and user.
       POSTGRES_DB: secland_bank_db
       POSTGRES_USER: postgres
-      # This tells PostgreSQL to trust connections from within the same Docker network.
       POSTGRES_HOST_AUTH_METHOD: trust
     volumes:
       - postgres-data:/var/lib/postgresql/data
@@ -19,11 +29,20 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 30s
     networks:
-      - secland_network # Connect to our single custom network
+      - secland_network
+    labels:
+      - "com.secland.tier=database"
+      - "com.secland.description=PostgreSQL database for banking application"
 
+  # ===================================================================
+  # BACKEND TIER - Spring Boot API Application
+  # ===================================================================
   app:
-    build: .
+    build: 
+      context: .
+      dockerfile: Dockerfile
     container_name: secland_bank_app
     depends_on:
       db:
@@ -31,22 +50,77 @@ services:
     ports:
       - "8080:8080"
     environment:
-      # The application now correctly points to the 'secland_bank_db' database.
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/secland_bank_db
       SPRING_DATASOURCE_USERNAME: postgres
-      # The password can be left empty as it's not used by the DB.
-      SPRING_DATASOURCE_PASSWORD:
+      SPRING_DATASOURCE_PASSWORD: ""
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_SQL_INIT_MODE: always
       SPRING_JPA_DEFER_DATASOURCE_INITIALIZATION: true
+      POSTGRES_DB: secland_bank_db
+      # Additional Spring Boot configurations
+      SPRING_PROFILES_ACTIVE: docker
+      LOGGING_LEVEL_COM_SECLAND: DEBUG
     restart: on-failure
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
     networks:
-      - secland_network # Connect to our single custom network
+      - secland_network
+    labels:
+      - "com.secland.tier=backend"
+      - "com.secland.description=Spring Boot API for banking operations"
 
+  # ===================================================================
+  # FRONTEND TIER - Nginx Web Server
+  # ===================================================================
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: secland_bank_frontend
+    depends_on:
+      app:
+        condition: service_healthy
+    ports:
+      - "80:80"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - secland_network
+    labels:
+      - "com.secland.tier=frontend"
+      - "com.secland.description=Nginx web server serving the banking frontend"
+    environment:
+      - NGINX_HOST=localhost
+      - NGINX_PORT=80
+
+# =====================================================================
+# VOLUMES - Persistent Data Storage
+# =====================================================================
 volumes:
   postgres-data:
+    driver: local
+    labels:
+      - "com.secland.description=PostgreSQL data persistence volume"
 
-# Here we define our single, consistent network for the entire project.
+# =====================================================================
+# NETWORKS - Container Communication
+# =====================================================================
 networks:
   secland_network:
     driver: bridge
+    name: secland_banking_network
+    labels:
+      - "com.secland.description=Internal network for banking application components"
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/16

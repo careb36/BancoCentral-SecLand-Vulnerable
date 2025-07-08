@@ -9,6 +9,11 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
 
 /**
  * Central configuration class for Spring Security.
@@ -53,6 +58,23 @@ public class SecurityConfig {
     }
 
     /**
+     * Configures CORS (Cross-Origin Resource Sharing) settings.
+     * This allows the frontend (running on port 80) to communicate with the backend (port 8080).
+     */
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowCredentials(true);
+        
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
+    /**
      * Configures the HTTP security filter chain.
      * <p>
      * This is where the access rules for the different API endpoints are defined.
@@ -66,6 +88,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                // Enable CORS with our configuration
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                
                 // Disable CSRF (Cross-Site Request Forgery) protection.
                 // It's common to disable this for stateless REST APIs that don't rely
                 // on cookie-based sessions, as protection is handled by other means (e.g., JWTs).

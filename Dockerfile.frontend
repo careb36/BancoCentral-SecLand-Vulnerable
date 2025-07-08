@@ -1,0 +1,26 @@
+# =====================================================================
+# Dockerfile.frontend
+# CentralBank SecLand - Frontend Container (Nginx)
+# =====================================================================
+# Purpose:
+#   - Creates a lightweight Nginx container to serve the banking frontend
+#   - Uses nginx:alpine for minimal footprint and security
+#   - Serves static files (HTML, CSS, JS) with SPA support
+# =====================================================================
+
+FROM nginx:alpine
+
+# Copy custom Nginx configuration
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# Copy static frontend files to Nginx document root
+COPY frontend/ /usr/share/nginx/html/
+
+# Create a simple health check endpoint
+RUN echo '<!DOCTYPE html><html><head><title>Health Check</title></head><body><h1>OK</h1></body></html>' > /usr/share/nginx/html/health
+
+# Expose port 80
+EXPOSE 80
+
+# Start Nginx in foreground mode
+CMD ["nginx", "-g", "daemon off;"]

@@ -95,12 +95,20 @@ public class TransactionServiceImpl implements TransactionService {
                 .map(transaction -> {
                     TransactionHistoryDto dto = new TransactionHistoryDto();
                     dto.setId(transaction.getId());
-                    dto.setSourceAccountId(transaction.getSourceAccountId());
-                    dto.setDestinationAccountId(transaction.getDestinationAccountId());
+                    
+                    // Get account numbers for display
+                    Account sourceAccount = accountRepository.findById(transaction.getSourceAccountId()).orElse(null);
+                    Account destinationAccount = accountRepository.findById(transaction.getDestinationAccountId()).orElse(null);
+                    
+                    dto.setFromAccountNumber(sourceAccount != null ? sourceAccount.getAccountNumber() : "Unknown");
+                    dto.setToAccountNumber(destinationAccount != null ? destinationAccount.getAccountNumber() : "Unknown");
                     dto.setAmount(transaction.getAmount());
                     // VULNERABILITY: Raw description returned without sanitization (Stored XSS)
                     dto.setDescription(transaction.getDescription());
                     dto.setTransactionDate(transaction.getTransactionDate());
+                    dto.setTransactionType("TRANSFER");
+                    dto.setStatus("COMPLETED");
+                    dto.setDirection("OUT"); // Default direction
                     return dto;
                 })
                 .collect(Collectors.toList());
@@ -132,12 +140,23 @@ public class TransactionServiceImpl implements TransactionService {
                 .map(row -> {
                     TransactionHistoryDto dto = new TransactionHistoryDto();
                     dto.setId(((Number) row[0]).longValue());
-                    dto.setSourceAccountId(((Number) row[1]).longValue());
-                    dto.setDestinationAccountId(((Number) row[2]).longValue());
+                    
+                    // Get account numbers for display
+                    Long sourceAccountId = ((Number) row[1]).longValue();
+                    Long destinationAccountId = ((Number) row[2]).longValue();
+                    
+                    Account sourceAccount = accountRepository.findById(sourceAccountId).orElse(null);
+                    Account destinationAccount = accountRepository.findById(destinationAccountId).orElse(null);
+                    
+                    dto.setFromAccountNumber(sourceAccount != null ? sourceAccount.getAccountNumber() : "Unknown");
+                    dto.setToAccountNumber(destinationAccount != null ? destinationAccount.getAccountNumber() : "Unknown");
                     dto.setAmount((BigDecimal) row[3]);
                     // VULNERABILITY: Raw description returned without sanitization (Stored XSS)
                     dto.setDescription((String) row[4]);
                     dto.setTransactionDate(((java.sql.Timestamp) row[5]).toLocalDateTime());
+                    dto.setTransactionType("TRANSFER");
+                    dto.setStatus("COMPLETED");
+                    dto.setDirection("OUT"); // Default direction
                     return dto;
                 })
                 .collect(Collectors.toList());

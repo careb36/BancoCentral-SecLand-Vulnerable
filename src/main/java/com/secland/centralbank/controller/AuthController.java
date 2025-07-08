@@ -36,20 +36,27 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto loginRequestDto) {
-        // We delegate the authentication task entirely to the AuthenticationManager.
-        // It will use our CustomUserDetailsService and PasswordEncoder automatically.
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequestDto.getUsername(),
-                        loginRequestDto.getPassword()
-                )
-        );
+        try {
+            // We delegate the authentication task entirely to the AuthenticationManager.
+            // It will use our CustomUserDetailsService and PasswordEncoder automatically.
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequestDto.getUsername(),
+                            loginRequestDto.getPassword()
+                    )
+            );
 
-        // If the line above doesn't throw an exception, the user is authenticated.
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+            // If the line above doesn't throw an exception, the user is authenticated.
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        // For now, we return a simple success message and a simulated token.
-        String token = "simulated.jwt.token.for." + loginRequestDto.getUsername();
-        return ResponseEntity.ok(new LoginResponseDto("Login successful!", token));
+            // For now, we return a simple success message and a simulated token.
+            String token = "simulated.jwt.token.for." + loginRequestDto.getUsername();
+            return ResponseEntity.ok(new LoginResponseDto("Login successful!", token));
+            
+        } catch (Exception e) {
+            // Return a proper error response instead of letting Spring Security handle it
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new LoginResponseDto("Invalid username or password", null));
+        }
     }
 }

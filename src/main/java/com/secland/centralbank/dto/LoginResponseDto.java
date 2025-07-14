@@ -6,8 +6,8 @@ import lombok.Data;
 /**
  * Data transfer object representing the response returned after a successful authentication attempt.
  * <p>
- * Encapsulates a human-readable message and an authentication token (e.g., JWT)
- * to be used in subsequent API requests for authorization.
+ * Encapsulates a human-readable message, an authentication token (e.g., JWT),
+ * and the username of the authenticated user.
  * </p>
  */
 @Data
@@ -29,4 +29,13 @@ public class LoginResponseDto {
      * </p>
      */
     private String token;
+
+    /**
+     * Username of the authenticated user.
+     * <p>
+     * This field is included to allow the frontend to identify the current user
+     * without making additional API calls.
+     * </p>
+     */
+    private String username;
 }

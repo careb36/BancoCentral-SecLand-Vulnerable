@@ -1,10 +1,11 @@
 package com.secland.centralbank.service;
 
+import java.util.List;
+
+import com.secland.centralbank.dto.FrontendTransferRequestDto;
 import com.secland.centralbank.dto.TransactionHistoryDto;
 import com.secland.centralbank.dto.TransferRequestDto;
 import com.secland.centralbank.model.Transaction;
-
-import java.util.List;
 
 /**
  * Service interface for handling financial transactions.
@@ -18,6 +19,25 @@ public interface TransactionService {
      * @return The resulting Transaction record.
      */
     Transaction performTransfer(TransferRequestDto transferRequestDto);
+
+    /**
+     * Performs a money transfer using frontend format (fromAccountId and toAccountNumber).
+     * <p>
+     * <strong>Intentional Vulnerability (IDOR):</strong> This method does not verify that the
+     * authenticated user owns the fromAccountId, allowing transfers from any account.
+     * </p>
+     *
+     * @param frontendTransferRequestDto DTO containing the frontend transfer details.
+     * @return The resulting Transaction record.
+     */
+    Transaction performFrontendTransfer(FrontendTransferRequestDto frontendTransferRequestDto);
+
+    /**
+     * Registra una transacción en el historial sin mover fondos (para depósitos iniciales, etc).
+     * @param transaction la transacción a registrar
+     * @return la transacción guardada
+     */
+    Transaction performTransferRecordOnly(com.secland.centralbank.model.Transaction transaction);
 
     /**
      * Retrieves transaction history for a specific account.

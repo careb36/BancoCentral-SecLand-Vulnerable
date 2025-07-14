@@ -18,7 +18,7 @@ services:
     environment:
       POSTGRES_DB: secland_bank_db
       POSTGRES_USER: postgres
-      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_PASSWORD: password
     volumes:
       - postgres-data:/var/lib/postgresql/data
     ports:
@@ -52,7 +52,7 @@ services:
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/secland_bank_db
       SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: ""
+      SPRING_DATASOURCE_PASSWORD: password
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_SQL_INIT_MODE: always
       SPRING_JPA_DEFER_DATASOURCE_INITIALIZATION: true
@@ -120,7 +120,3 @@ networks:
     name: secland_banking_network
     labels:
       - "com.secland.description=Internal network for banking application components"
-    ipam:
-      driver: default
-      config:
-        - subnet: 172.20.0.0/16

@@ -1,14 +1,26 @@
 package com.secland.centralbank.controller;
 
-import com.secland.centralbank.dto.TransactionHistoryDto;
-import com.secland.centralbank.dto.TransferRequestDto;
-import com.secland.centralbank.model.Transaction;
-import com.secland.centralbank.service.TransactionService;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import com.secland.centralbank.dto.CreateAccountRequestDto;
+import com.secland.centralbank.dto.DepositRequestDto;
+import com.secland.centralbank.dto.FrontendTransferRequestDto;
+import com.secland.centralbank.dto.TransactionHistoryDto;
+import com.secland.centralbank.model.Account;
+import com.secland.centralbank.model.Transaction;
+import com.secland.centralbank.service.AccountService;
+import com.secland.centralbank.service.TransactionService;
 
 /**
  * REST controller exposing endpoints for account-related operations.
@@ -25,39 +37,122 @@ import java.util.List;
 @RequestMapping("/api/accounts")
 public class AccountController {
 
-    /**
-     * Service for performing transactions.
-     * <p>
-     * Constructor injection is generally preferred over field injection for better testability and immutability.
-     * </p>
-     */
-    @Autowired
-    private TransactionService transactionService;
+    private final TransactionService transactionService;
+    private final AccountService accountService;
+
+    public AccountController(TransactionService transactionService, AccountService accountService) {
+        this.transactionService = transactionService;
+        this.accountService = accountService;
+    }
 
     /**
-     * Executes a money transfer between two user accounts.
+     * Retrieves all accounts for the currently authenticated user.
+     * <p>
+     * <strong>Security Note:</strong> This endpoint properly retrieves accounts for the
+     * authenticated user only, serving as a secure counterexample to vulnerable endpoints.
+     * </p>
+     *
+     * @return {@code 200 OK} with list of user accounts if successful;
+     *         {@code 401 Unauthorized} if user is not authenticated
+     */
+    @GetMapping
+    public ResponseEntity<List<Account>> getUserAccounts() {
+        List<Account> accounts = accountService.getUserAccounts();
+        return ResponseEntity.ok(accounts);
+    }
+
+    /**
+     * Retrieves all accounts for a specific user by username.
+     * <p>
+     * <strong>Intentional Vulnerability (IDOR):</strong> This endpoint does not verify
+     * that the request is coming from the actual user, allowing access to any user's
+     * accounts by providing their username.
+     * </p>
+     *
+     * @param username the username whose accounts to retrieve
+     * @return {@code 200 OK} with list of user accounts if successful;
+     *         {@code 400 Bad Request} if an error occurs
+     */
+    @GetMapping("/user/{username}")
+    public ResponseEntity<List<Account>> getUserAccountsByUsername(@PathVariable String username) {
+        List<Account> accounts = accountService.getAccountsByUsername(username);
+        return ResponseEntity.ok(accounts);
+    }
+
+    /**
+     * Creates a new account for a specific user.
+     * <p>
+     * <strong>Intentional Vulnerability (IDOR):</strong> This endpoint does not verify
+     * that the request is coming from the actual user, allowing account creation
+     * for any user by providing their username.
+     * </p>
+     *
+     * @param request DTO containing username and account type
+     * @return {@code 201 Created} with the created account if successful;
+     *         {@code 400 Bad Request} if an error occurs
+     */
+    @PostMapping("/create")
+    public ResponseEntity<Account> createAccount(@RequestBody CreateAccountRequestDto request) {
+        Account newAccount = accountService.createAccountForUser(request.getUsername(), request.getAccountType(), request.getInitialDeposit());
+        return ResponseEntity.status(201).body(newAccount);
+    }
+
+    /**
+     * Executes a money transfer between two user accounts using frontend format.
      * <p>
      * <strong>Intentional Vulnerability (IDOR):</strong> This endpoint does not verify that the authenticated user
-     * is authorized to transfer funds from the specified source account.
+     * is authorized to transfer funds from the specified fromAccountId.
      * Attackers could manipulate the payload to transfer funds from any account.
      * </p>
      *
-     * @param transferRequestDto payload containing the source account ID, destination account ID, amount, and optional description
+     * @param frontendTransferRequestDto payload containing the from account ID, to account number, amount, and optional description
      * @return {@code 200 OK} with the created {@link Transaction} if successful;
      *         {@code 400 Bad Request} if an error occurs (e.g., account not found or business rule violation)
      */
     @PostMapping("/transfer")
     public ResponseEntity<Transaction> transferMoney(
-            @RequestBody TransferRequestDto transferRequestDto) {
+            @RequestBody FrontendTransferRequestDto frontendTransferRequestDto) {
+        Transaction transaction = transactionService.performFrontendTransfer(frontendTransferRequestDto);
+        return ResponseEntity.ok(transaction);
+    }
 
-        try {
-            // Perform the transfer; service may throw RuntimeException for validation failures
-            Transaction transaction = transactionService.performTransfer(transferRequestDto);
-            return ResponseEntity.ok(transaction);
-        } catch (RuntimeException e) {
-            // Return a clear 400 response on errors such as "Account not found" or business rule violations
-            return ResponseEntity.badRequest().build();
-        }
+    /**
+     * Deposits money into a specific account.
+     * <p>
+     * <strong>Intentional Vulnerability (IDOR):</strong> This endpoint does not verify
+     * that the request is coming from the actual account owner, allowing deposits
+     * into any account by providing the account ID.
+     * </p>
+     *
+     * @param accountId the ID of the account to deposit money into
+     * @param request DTO containing the amount to deposit
+     * @return {@code 200 OK} with the updated account if successful;
+     *         {@code 400 Bad Request} if an error occurs
+     */
+    @PostMapping("/{accountId}/deposit")
+    public ResponseEntity<Account> depositMoney(
+            @PathVariable Long accountId,
+            @RequestBody DepositRequestDto request) {
+        Account updatedAccount = accountService.depositMoney(accountId, request.getAmount());
+        return ResponseEntity.ok(updatedAccount);
+    }
+
+    /**
+     * Deletes a specific account.
+     * <p>
+     * <strong>Intentional Vulnerability (IDOR):</strong> This endpoint does not verify
+     * that the request is coming from the actual account owner, allowing deletion
+     * of any account by providing the account ID.
+     * </p>
+     *
+     * @param accountId the ID of the account to delete
+     * @return {@code 200 OK} if successful;
+     *         {@code 400 Bad Request} if an error occurs
+     */
+    @DeleteMapping("/{accountId}")
+    public ResponseEntity<Void> deleteAccount(@PathVariable Long accountId) {
+        accountService.deleteAccount(accountId);
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -80,13 +175,7 @@ public class AccountController {
     @GetMapping("/{accountId}/transactions")
     public ResponseEntity<List<TransactionHistoryDto>> getTransactionHistory(
             @PathVariable Long accountId) {
-        
-        try {
-            // VULNERABILITY: No authorization check - any user can access any account's transactions
-            List<TransactionHistoryDto> transactions = transactionService.getTransactionHistory(accountId);
-            return ResponseEntity.ok(transactions);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        List<TransactionHistoryDto> transactions = transactionService.getTransactionHistory(accountId);
+        return ResponseEntity.ok(transactions);
     }
 }

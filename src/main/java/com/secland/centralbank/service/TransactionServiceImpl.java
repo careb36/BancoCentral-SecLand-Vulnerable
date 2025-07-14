@@ -1,20 +1,23 @@
 package com.secland.centralbank.service;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.secland.centralbank.dto.FrontendTransferRequestDto;
 import com.secland.centralbank.dto.TransactionHistoryDto;
 import com.secland.centralbank.dto.TransferRequestDto;
 import com.secland.centralbank.model.Account;
 import com.secland.centralbank.model.Transaction;
 import com.secland.centralbank.repository.AccountRepository;
 import com.secland.centralbank.repository.TransactionRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Implementation for the TransactionService.
@@ -23,14 +26,15 @@ import java.util.stream.Collectors;
 @Service
 public class TransactionServiceImpl implements TransactionService {
 
-    @Autowired
-    private AccountRepository accountRepository;
+    private final AccountRepository accountRepository;
+    private final TransactionRepository transactionRepository;
+    private final EntityManager entityManager;
 
-    @Autowired
-    private TransactionRepository transactionRepository;
-
-    @Autowired
-    private EntityManager entityManager;
+    public TransactionServiceImpl(AccountRepository accountRepository, TransactionRepository transactionRepository, EntityManager entityManager) {
+        this.accountRepository = accountRepository;
+        this.transactionRepository = transactionRepository;
+        this.entityManager = entityManager;
+    }
 
     /**
      * Performs a funds transfer from a source account to a destination account.
@@ -70,6 +74,47 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setDestinationAccountId(destinationAccount.getId());
         transaction.setAmount(amount);
         transaction.setDescription(transferRequestDto.getDescription());
+
+        return transactionRepository.save(transaction);
+    }
+
+    /**
+     * Performs a funds transfer using frontend format (fromAccountId and toAccountNumber).
+     * <p>
+     * <strong>Intentional Vulnerability (IDOR):</strong> This method does not verify that the
+     * authenticated user owns the fromAccountId, allowing transfers from any account.
+     * </p>
+     *
+     * @param frontendTransferRequestDto DTO with frontend transfer details.
+     * @return The saved Transaction object.
+     * @throws RuntimeException if source or destination accounts are not found.
+     */
+    @Override
+    @Transactional
+    public Transaction performFrontendTransfer(FrontendTransferRequestDto frontendTransferRequestDto) {
+        // VULNERABILITY: No authorization check - any user can transfer from any account
+        Account sourceAccount = accountRepository.findById(frontendTransferRequestDto.getFromAccountId())
+                .orElseThrow(() -> new RuntimeException("Source account not found"));
+
+        Account destinationAccount = accountRepository.findByAccountNumber(frontendTransferRequestDto.getToAccountNumber())
+                .orElseThrow(() -> new RuntimeException("Destination account not found"));
+
+        BigDecimal amount = frontendTransferRequestDto.getAmount();
+
+        // VULNERABILITY: No balance check - allows negative balances
+        // Perform the transfer
+        sourceAccount.setBalance(sourceAccount.getBalance().subtract(amount));
+        destinationAccount.setBalance(destinationAccount.getBalance().add(amount));
+
+        accountRepository.save(sourceAccount);
+        accountRepository.save(destinationAccount);
+
+        // Record the transaction
+        Transaction transaction = new Transaction();
+        transaction.setSourceAccountId(sourceAccount.getId());
+        transaction.setDestinationAccountId(destinationAccount.getId());
+        transaction.setAmount(amount);
+        transaction.setDescription(frontendTransferRequestDto.getDescription());
 
         return transactionRepository.save(transaction);
     }
@@ -160,5 +205,11 @@ public class TransactionServiceImpl implements TransactionService {
                     return dto;
                 })
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Transaction performTransferRecordOnly(Transaction transaction) {
+        // Solo guarda la transacción, no mueve fondos
+        return transactionRepository.save(transaction);
     }
 }

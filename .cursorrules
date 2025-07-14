@@ -1,0 +1,71 @@
+# .cursorrules - Professional rules for BancoCentral-SecLand-Vulnerable
+# NOTE: This project contains intentional vulnerabilities for ethical hacking and security research. Do NOT use in production.
+# Purpose: Ensure code quality, security, and maintainability in a deliberately vulnerable banking lab.
+
+[ignore]
+# Ignore build, dependency, and system folders
+/target/
+/node_modules/
+/.mvn/
+/.vscode/
+/.git/
+/frontend/node_modules/
+/frontend/dist/
+
+# Ignore temp, system, and editor files
+*.log
+*.tmp
+*.swp
+.DS_Store
+Thumbs.db
+
+# Ignore sensitive or large files
+*.jar
+*.zip
+*.png
+*.jpg
+*.jpeg
+*.pdf
+*.env
+*.db
+
+[format]
+# Java: 4 spaces, Frontend (JS/CSS/HTML): 2 spaces
+*.java: indent=4
+*.js: indent=2
+*.css: indent=2
+*.html: indent=2
+
+[lint]
+# Java: enforce checkstyle, avoid unused/wildcard imports, prefer explicit types
+*.java: checkstyle, unused-imports, no-wildcard-imports, prefer-final, no-hardcoded-passwords
+# JS: enforce eslint, avoid unused vars, require semicolons, prefer const/let
+*.js: eslint, no-unused-vars, semi, prefer-const, no-eval
+# CSS: enforce stylelint, avoid !important, prefer variables
+*.css: stylelint, no-important, prefer-variables
+
+[security]
+# Warn on hardcoded credentials, secrets, or tokens
+*.java: no-hardcoded-credentials, no-plaintext-passwords
+*.js: no-hardcoded-credentials, no-plaintext-passwords
+*.env: no-plaintext-passwords
+
+[search]
+# Exclude binaries and large files from search
+*.jar
+*.zip
+*.png
+*.jpg
+*.jpeg
+*.pdf
+
+[collaboration]
+# Recommend clear commit messages and PR descriptions
+# Use feature branches for new features or experiments
+# Document intentional vulnerabilities in PRs/issues
+
+[audit]
+# Track changes to authentication, authorization, and transaction logic
+# Flag changes to Docker, database schema, and security config for review
+
+# End of file 

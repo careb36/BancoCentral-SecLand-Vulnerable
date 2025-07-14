@@ -1,5 +1,7 @@
 package com.secland.centralbank.config;
 
+import java.util.Arrays;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,8 +15,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
-
 /**
  * Central configuration class for Spring Security.
  * <p>
@@ -22,9 +22,19 @@ import java.util.Arrays;
  * password encoding, authentication management, and authorization rules
  * for HTTP endpoints.
  */
+import com.secland.centralbank.filter.JwtRequestFilter;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    private final JwtRequestFilter jwtRequestFilter;
+
+    public SecurityConfig(JwtRequestFilter jwtRequestFilter) {
+        this.jwtRequestFilter = jwtRequestFilter;
+    }
 
     /**
      * Defines the PasswordEncoder bean for the entire application.
@@ -96,6 +106,15 @@ public class SecurityConfig {
                 // on cookie-based sessions, as protection is handled by other means (e.g., JWTs).
                 .csrf(csrf -> csrf.disable())
 
+                // Disable HTTP Basic authentication
+                .httpBasic(basic -> basic.disable())
+
+                // Disable form login
+                .formLogin(form -> form.disable())
+
+                // Disable logout
+                .logout(logout -> logout.disable())
+
                 // Define the authorization rules for HTTP requests.
                 .authorizeHttpRequests(auth -> auth
                         // Allow public (unauthenticated) access to all endpoints
@@ -105,10 +124,16 @@ public class SecurityConfig {
                         // Allow public access to actuator endpoints for health checks
                         .requestMatchers("/actuator/**").permitAll()
 
+                        // Allow access to error pages
+                        .requestMatchers("/error").permitAll()
+
                         // Require any other request to the API to be authenticated.
                         // This rule ensures that endpoints like /api/accounts/transfer are protected.
                         .anyRequest().authenticated()
-                );
+                )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
+        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

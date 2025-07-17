@@ -1,10 +1,12 @@
 package com.secland.centralbank.controller;
 
 import java.util.List;
-import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,11 +24,29 @@ import com.secland.centralbank.model.Transaction;
 import com.secland.centralbank.service.AccountService;
 import com.secland.centralbank.service.TransactionService;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+
 /**
  * REST controller exposing endpoints for account-related operations.
  * <p>
- * <strong>Security Notice:</strong> This controller intentionally contains an Insecure Direct Object Reference (IDOR)
- * vulnerability in the transferMoney endpoint for educational and demonstration purposes.
+ * <strong>Security Notice:</strong> This controller intentionally contains several Insecure Direct Object Reference (IDOR)
+ * vulnerabilities for educational and demonstration purposes. These vulnerabilities allow unauthorized access
+ * to accounts and transactions that do not belong to the authenticated user.
+ * </p>
+ * 
+ * <p>
+ * <strong>Intentional Vulnerabilities:</strong>
+ * <ul>
+ *   <li>Account creation for any user by username (IDOR)</li>
+ *   <li>Account access by username without ownership verification (IDOR)</li>
+ *   <li>Fund transfers from any account without ownership verification (IDOR)</li>
+ *   <li>Deposits to any account without ownership verification (IDOR)</li>
+ *   <li>Account deletion without ownership verification (IDOR)</li>
+ *   <li>Transaction history access for any account (IDOR)</li>
+ * </ul>
  * </p>
  *
  * @see <a href="https://spring.io/guides/tutorials/rest/">Building REST services with Spring</a>
@@ -35,7 +55,10 @@ import com.secland.centralbank.service.TransactionService;
  */
 @RestController
 @RequestMapping("/api/accounts")
+@Validated
 public class AccountController {
+    
+    private static final Logger log = LoggerFactory.getLogger(AccountController.class);
 
     private final TransactionService transactionService;
     private final AccountService accountService;
@@ -52,12 +75,15 @@ public class AccountController {
      * authenticated user only, serving as a secure counterexample to vulnerable endpoints.
      * </p>
      *
+     * @param authentication the current user's authentication context
      * @return {@code 200 OK} with list of user accounts if successful;
      *         {@code 401 Unauthorized} if user is not authenticated
      */
     @GetMapping
-    public ResponseEntity<List<Account>> getUserAccounts() {
+    public ResponseEntity<List<Account>> getUserAccounts(Authentication authentication) {
+        log.info("User '{}' requesting their accounts", authentication.getName());
         List<Account> accounts = accountService.getUserAccounts();
+        log.info("User '{}' has {} accounts", authentication.getName(), accounts.size());
         return ResponseEntity.ok(accounts);
     }
 
@@ -70,12 +96,20 @@ public class AccountController {
      * </p>
      *
      * @param username the username whose accounts to retrieve
+     * @param authentication the current user's authentication context
      * @return {@code 200 OK} with list of user accounts if successful;
      *         {@code 400 Bad Request} if an error occurs
      */
     @GetMapping("/user/{username}")
-    public ResponseEntity<List<Account>> getUserAccountsByUsername(@PathVariable String username) {
+    public ResponseEntity<List<Account>> getUserAccountsByUsername(
+            @PathVariable @NotBlank(message = "Username cannot be blank") String username,
+            Authentication authentication) {
+        
+        log.warn("SECURITY VULNERABILITY: User '{}' accessing accounts for user '{}' (IDOR)", 
+                authentication.getName(), username);
+        
         List<Account> accounts = accountService.getAccountsByUsername(username);
+        log.info("Retrieved {} accounts for user '{}'", accounts.size(), username);
         return ResponseEntity.ok(accounts);
     }
 
@@ -87,13 +121,31 @@ public class AccountController {
      * for any user by providing their username.
      * </p>
      *
-     * @param request DTO containing username and account type
+     * @param request DTO containing username, account type, and initial deposit
+     * @param authentication the current user's authentication context
      * @return {@code 201 Created} with the created account if successful;
-     *         {@code 400 Bad Request} if an error occurs
+     *         {@code 400 Bad Request} if validation fails or an error occurs
      */
     @PostMapping("/create")
-    public ResponseEntity<Account> createAccount(@RequestBody CreateAccountRequestDto request) {
-        Account newAccount = accountService.createAccountForUser(request.getUsername(), request.getAccountType(), request.getInitialDeposit());
+    public ResponseEntity<Account> createAccount(
+            @Valid @RequestBody CreateAccountRequestDto request,
+            Authentication authentication) {
+        
+        log.warn("SECURITY VULNERABILITY: User '{}' creating account for user '{}' (IDOR)", 
+                authentication.getName(), request.getUsername());
+        
+        log.info("Creating {} account for user '{}' with initial deposit: ${}", 
+                request.getAccountType(), request.getUsername(), request.getInitialDeposit());
+        
+        Account newAccount = accountService.createAccountForUser(
+                request.getUsername(), 
+                request.getAccountType(), 
+                request.getInitialDeposit()
+        );
+        
+        log.info("Successfully created account {} for user '{}'", 
+                newAccount.getAccountNumber(), request.getUsername());
+        
         return ResponseEntity.status(201).body(newAccount);
     }
 
@@ -106,13 +158,26 @@ public class AccountController {
      * </p>
      *
      * @param frontendTransferRequestDto payload containing the from account ID, to account number, amount, and optional description
+     * @param authentication the current user's authentication context
      * @return {@code 200 OK} with the created {@link Transaction} if successful;
      *         {@code 400 Bad Request} if an error occurs (e.g., account not found or business rule violation)
      */
     @PostMapping("/transfer")
     public ResponseEntity<Transaction> transferMoney(
-            @RequestBody FrontendTransferRequestDto frontendTransferRequestDto) {
+            @Valid @RequestBody FrontendTransferRequestDto frontendTransferRequestDto,
+            Authentication authentication) {
+        
+        log.warn("SECURITY VULNERABILITY: User '{}' transferring from account {} (IDOR)", 
+                authentication.getName(), frontendTransferRequestDto.getFromAccountId());
+        
+        log.info("Transfer initiated: ${} from account {} to account {}", 
+                frontendTransferRequestDto.getAmount(),
+                frontendTransferRequestDto.getFromAccountId(),
+                frontendTransferRequestDto.getToAccountNumber());
+        
         Transaction transaction = transactionService.performFrontendTransfer(frontendTransferRequestDto);
+        
+        log.info("Transfer completed successfully. Transaction ID: {}", transaction.getId());
         return ResponseEntity.ok(transaction);
     }
 
@@ -126,14 +191,24 @@ public class AccountController {
      *
      * @param accountId the ID of the account to deposit money into
      * @param request DTO containing the amount to deposit
+     * @param authentication the current user's authentication context
      * @return {@code 200 OK} with the updated account if successful;
      *         {@code 400 Bad Request} if an error occurs
      */
     @PostMapping("/{accountId}/deposit")
     public ResponseEntity<Account> depositMoney(
-            @PathVariable Long accountId,
-            @RequestBody DepositRequestDto request) {
+            @PathVariable @NotNull(message = "Account ID cannot be null") @Positive(message = "Account ID must be positive") Long accountId,
+            @Valid @RequestBody DepositRequestDto request,
+            Authentication authentication) {
+        
+        log.warn("SECURITY VULNERABILITY: User '{}' depositing into account {} (IDOR)", 
+                authentication.getName(), accountId);
+        
+        log.info("Deposit initiated: ${} into account {}", request.getAmount(), accountId);
+        
         Account updatedAccount = accountService.depositMoney(accountId, request.getAmount());
+        
+        log.info("Deposit completed successfully. New balance: ${}", updatedAccount.getBalance());
         return ResponseEntity.ok(updatedAccount);
     }
 
@@ -146,12 +221,23 @@ public class AccountController {
      * </p>
      *
      * @param accountId the ID of the account to delete
+     * @param authentication the current user's authentication context
      * @return {@code 200 OK} if successful;
      *         {@code 400 Bad Request} if an error occurs
      */
     @DeleteMapping("/{accountId}")
-    public ResponseEntity<Void> deleteAccount(@PathVariable Long accountId) {
+    public ResponseEntity<Void> deleteAccount(
+            @PathVariable @NotNull(message = "Account ID cannot be null") @Positive(message = "Account ID must be positive") Long accountId,
+            Authentication authentication) {
+        
+        log.warn("SECURITY VULNERABILITY: User '{}' deleting account {} (IDOR)", 
+                authentication.getName(), accountId);
+        
+        log.info("Account deletion initiated for account {}", accountId);
+        
         accountService.deleteAccount(accountId);
+        
+        log.info("Account {} deleted successfully", accountId);
         return ResponseEntity.ok().build();
     }
 
@@ -170,12 +256,22 @@ public class AccountController {
      * </p>
      *
      * @param accountId the ID of the account to retrieve transaction history for
+     * @param authentication the current user's authentication context
      * @return ResponseEntity containing a list of TransactionHistoryDto with transaction details
      */
     @GetMapping("/{accountId}/transactions")
     public ResponseEntity<List<TransactionHistoryDto>> getTransactionHistory(
-            @PathVariable Long accountId) {
+            @PathVariable @NotNull(message = "Account ID cannot be null") @Positive(message = "Account ID must be positive") Long accountId,
+            Authentication authentication) {
+        
+        log.warn("SECURITY VULNERABILITY: User '{}' accessing transaction history for account {} (IDOR)", 
+                authentication.getName(), accountId);
+        
+        log.info("Retrieving transaction history for account {}", accountId);
+        
         List<TransactionHistoryDto> transactions = transactionService.getTransactionHistory(accountId);
+        
+        log.info("Retrieved {} transactions for account {}", transactions.size(), accountId);
         return ResponseEntity.ok(transactions);
     }
 }

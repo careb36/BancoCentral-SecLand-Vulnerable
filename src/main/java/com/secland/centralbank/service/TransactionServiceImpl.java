@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -171,7 +170,6 @@ public class TransactionServiceImpl implements TransactionService {
      * @return List of TransactionHistoryDto matching the search criteria
      */
     @Override
-    @SuppressWarnings("unchecked")
     public List<TransactionHistoryDto> searchTransactionsByDescription(String description) {
         // VULNERABILITY: SQL Injection through string concatenation
         String sql = "SELECT t.id, t.source_account_id, t.destination_account_id, t.amount, " +
@@ -179,6 +177,7 @@ public class TransactionServiceImpl implements TransactionService {
                      "WHERE t.description LIKE '%" + description + "%'";
 
         Query query = entityManager.createNativeQuery(sql);
+        @SuppressWarnings("unchecked")
         List<Object[]> results = query.getResultList();
 
         return results.stream()

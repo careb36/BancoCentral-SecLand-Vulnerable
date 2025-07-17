@@ -7,20 +7,22 @@
 --   - Designed to be idempotent: re-running this script will not duplicate data.
 -- ---------------------------------------------------------------------
 -- Notes:
---   - Passwords are already hashed with BCrypt for security.
+--   - Passwords are hashed with BCrypt for security.
 --   - Uses ON CONFLICT (PostgreSQL UPSERT) to avoid insertion errors.
 --   - Demo credentials: testuser/password123 and admin/admin123
 -- =====================================================================
 
 -- Insert Users (do nothing if already exists)
 -- Password hashes generated with BCrypt strength 10:
--- - password123 -> $2a$10$e0MYzXyjpJS7Pd0RVvHwHe.CxOCPtNUZRsW.jBjZplAyhz8G/L3F.
--- - admin123 -> $2a$10$5K8yJkGl7.H2Rs7/pVVNa.YvZQZeJZjQZ5K8yJkGl7.H2Rs7/pVVNa
+-- - password123 -> $2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi
+-- - admin123 -> $2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi
+-- - carolina123 -> $2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi
+-- - test123 -> $2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi
 INSERT INTO users (id, username, password, full_name, created_at) VALUES
-    (1, 'testuser',   '$2a$10$e0MYzXyjpJS7Pd0RVvHwHe.CxOCPtNUZRsW.jBjZplAyhz8G/L3F.', 'Demo Test User',   NOW()),
-    (2, 'admin',      '$2a$10$5K8yJkGl7.H2Rs7/pVVNa.YvZQZeJZjQZ5K8yJkGl7.H2Rs7/pVVNa', 'System Administrator', NOW()),
-    (3, 'carolina_p', '$2a$10$wL455.T8/y.P.WJ2b2aN9uBFy1dI5a2kig7P4PDBxPj49L5L5aZ5W', 'Carolina Pereira', NOW()),
-    (4, 'test_user',  '$2a$10$9.d/R4/L/LqI1S.y2.zDDeuXy20o3f7V9.0d2i6C1h43j2.y5n2eW', 'Test User',        NOW())
+    (1, 'testuser',   '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Demo Test User',   NOW()),
+    (2, 'admin',      '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'System Administrator', NOW()),
+    (3, 'carolina_p', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Carolina Pereira', NOW()),
+    (4, 'test_user',  '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Test User',        NOW())
 ON CONFLICT (id) DO NOTHING;
 
 -- Insert Bank Accounts (do nothing if already exists)

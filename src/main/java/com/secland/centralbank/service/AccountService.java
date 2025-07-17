@@ -3,6 +3,7 @@ package com.secland.centralbank.service;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.secland.centralbank.dto.CreateAccountRequestDto;
 import com.secland.centralbank.model.Account;
 
 /**
@@ -42,7 +43,7 @@ public interface AccountService {
      * @param accountType the type of account to create (e.g., "Savings", "Checking")
      * @return the created account
      */
-    Account createAccount(String accountType);
+    Account createAccount(CreateAccountRequestDto accountType);
     
     /**
      * Creates a new account for a specific user by username.

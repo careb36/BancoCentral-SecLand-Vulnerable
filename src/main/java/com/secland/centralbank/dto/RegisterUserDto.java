@@ -1,6 +1,5 @@
 package com.secland.centralbank.dto;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -9,6 +8,16 @@ import lombok.Data;
  * Data transfer object for new user registration requests.
  * <p>
  * Used to capture and validate input data required for creating a new user account.
+ * Implements basic validation while allowing testing of various input scenarios.
+ * </p>
+ * 
+ * <p>
+ * <strong>Intentional Vulnerabilities:</strong>
+ * <ul>
+ *   <li>Weak password requirements to allow testing of brute force attacks</li>
+ *   <li>No input sanitization to allow testing of injection attacks</li>
+ *   <li>No rate limiting to allow testing of DoS attacks</li>
+ * </ul>
  * </p>
  */
 @Data
@@ -17,7 +26,8 @@ public class RegisterUserDto {
     /**
      * Desired username for the new user account.
      * <p>
-     * This field must not be blank and must be between 3 and 20 characters in length.
+     * Must be between 3 and 20 characters. No format restrictions to allow testing
+     * of various input scenarios including potential injection attacks.
      * </p>
      */
     @NotBlank(message = "Username must not be blank")
@@ -27,7 +37,8 @@ public class RegisterUserDto {
     /**
      * Password for the new user account.
      * <p>
-     * This field must not be blank and must be at least 8 characters for security purposes.
+     * Must be at least 8 characters. No complexity requirements to allow testing
+     * of weak password scenarios and brute force attacks.
      * </p>
      */
     @NotBlank(message = "Password must not be blank")
@@ -37,7 +48,8 @@ public class RegisterUserDto {
     /**
      * Full name of the user.
      * <p>
-     * This field is optional but recommended for improved clarity in user profiles and displays.
+     * Optional field for improved user experience. No format restrictions to allow
+     * testing of various input scenarios including potential XSS attacks.
      * </p>
      */
     private String fullName;
@@ -45,9 +57,9 @@ public class RegisterUserDto {
     /**
      * Email address of the user.
      * <p>
-     * Must conform to a valid email format.
+     * Optional field with basic email format validation. No additional restrictions to allow testing
+     * of various email-related vulnerabilities.
      * </p>
      */
-    @Email(message = "Email should be valid")
     private String email;
 }

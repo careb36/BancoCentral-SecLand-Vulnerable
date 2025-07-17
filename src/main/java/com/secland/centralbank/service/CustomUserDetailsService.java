@@ -1,14 +1,14 @@
 package com.secland.centralbank.service;
 
-import com.secland.centralbank.model.User;
-import com.secland.centralbank.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.ArrayList;
+
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import com.secland.centralbank.model.User;
+import com.secland.centralbank.repository.UserRepository;
 
 /**
  * This service acts as a bridge between our application's User model and
@@ -17,8 +17,11 @@ import java.util.ArrayList;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+
+    public CustomUserDetailsService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     /**
      * Loads a user by their username for Spring Security.

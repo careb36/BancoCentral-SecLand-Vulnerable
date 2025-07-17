@@ -4,10 +4,11 @@ FROM maven:3.9.6-eclipse-temurin-21 AS build
 WORKDIR /app
 # Copy only the pom.xml to download dependencies efficiently
 COPY pom.xml .
-RUN mvn dependency:go-offline
+# Download dependencies without executing build
+RUN mvn dependency:go-offline -B
 # Copy the rest of the source code and build the JAR
 COPY src ./src
-RUN mvn package -DskipTests
+RUN mvn package -DskipTests -B
 
 # Stage 2: Run the application
 # Use a lightweight Java image to run the application

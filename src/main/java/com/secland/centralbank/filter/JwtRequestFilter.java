@@ -2,6 +2,7 @@ package com.secland.centralbank.filter;
 
 import com.secland.centralbank.service.CustomUserDetailsService;
 import com.secland.centralbank.util.JwtUtil;
+import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,7 +28,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
+    protected void doFilterInternal(@NonNull HttpServletRequest request, 
+                                   @NonNull HttpServletResponse response, 
+                                   @NonNull FilterChain chain) throws ServletException, IOException {
 
         final String authorizationHeader = request.getHeader("Authorization");
 

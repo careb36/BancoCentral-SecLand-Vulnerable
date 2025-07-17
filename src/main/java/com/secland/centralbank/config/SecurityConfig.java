@@ -73,11 +73,18 @@ public class SecurityConfig {
      */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
+        // VULN: Open CORS policy allowing all origins, methods and headers
+        // This is intentionally vulnerable to demonstrate CORS-based attacks
+        // In a secure implementation, you would:
+        // 1. Specify exact allowed origins
+        // 2. Limit allowed methods to those needed
+        // 3. Explicitly list required headers
+        // 4. Consider if credentials are really needed
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
-        configuration.setAllowCredentials(true);
+        configuration.setAllowedOriginPatterns(Arrays.asList("*")); // VULN: Allows any origin
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS")); // VULN: All methods allowed
+        configuration.setAllowedHeaders(Arrays.asList("*")); // VULN: All headers allowed
+        configuration.setAllowCredentials(true); // VULN: Allows credentials from any origin
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

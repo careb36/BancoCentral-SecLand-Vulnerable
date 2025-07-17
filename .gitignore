@@ -6,6 +6,10 @@ build/            # Gradle default build output
 out/              # IntelliJ non-Maven/Gradle output
 bin/              # Other build binaries
 
+# Maven specific files that should never be tracked
+target/**         # Everything under target directory
+**/target/**      # Target directories at any level
+
 # --------------------------------------
 # Package & archive files
 # --------------------------------------
@@ -70,6 +74,9 @@ bancocentral.iml
 # VS Code
 .vscode/
 /.vscode/*                    # Uncomment to track specific workspace settings
+
+# Cursor IDE
+.cursor/
 
 # --------------------------------------
 # OS-specific files

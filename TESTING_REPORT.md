@@ -207,7 +207,7 @@ El sistema cumple perfectamente su propósito educativo:
 
 ## 📞 SOPORTE TÉCNICO
 
-**Repositorio**: careb36-BancoCentral-SecLand-Vulnerable  
+**Repositorio**: CentralBank-SecLand-Vulnerable  
 **Branch**: develop  
 **Docker Status**: Funcionando correctamente (reinicio requerido)  
 

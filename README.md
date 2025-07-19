@@ -74,9 +74,10 @@ This project aims to provide a controlled environment for:
 
 ## 🛠️ Technologies Used
 
+- **Frontend:** Next.js 15.2.4, React 19, TypeScript, Tailwind CSS, Radix UI
 - **Backend:** Java 21, Spring Boot 3, Spring Security, Spring Data JPA
 - **Database:** PostgreSQL 15
-- **Build Tool:** Maven
+- **Build Tool:** Maven (Backend), pnpm (Frontend)
 - **Containerization:** Docker, Docker Compose
 - **Testing:** JUnit 5, Postman
 - **Attack Platform:** Kali Linux
@@ -106,9 +107,9 @@ cd BancoCentral-SecLand-Vulnerable
 Create a `.env` file in the root directory:
 ```env
 # Database Configuration
-POSTGRES_DB=secland_bank
-POSTGRES_USER=secland_admin
-POSTGRES_PASSWORD=your_secure_password
+POSTGRES_DB=secland_bank_db
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=password
 
 # JWT Configuration
 JWT_SECRET=your_jwt_secret_key
@@ -116,8 +117,11 @@ JWT_EXPIRATION=86400000  # 24 hours in milliseconds
 
 # Application Ports
 BACKEND_PORT=8080
-FRONTEND_PORT=80
+FRONTEND_PORT=3000
 DB_PORT=5432
+
+# Frontend Configuration
+NEXT_PUBLIC_API_URL=http://localhost:8080/api
 ```
 
 3. **Start the Application:**
@@ -148,13 +152,13 @@ mvnw.cmd spring-boot:run # Windows PowerShell
 
 # Frontend (Terminal 2)
 cd frontend
-npm install
-npm start
+npm install  # or: pnpm install
+npm run dev  # or: pnpm dev
 ```
 
 ### **Access Points:**
 
-- **Frontend:** http://localhost:80
+- **Frontend:** http://localhost:3000
 - **Backend API:** http://localhost:8080
 - **Swagger UI:** http://localhost:8080/swagger-ui/index.html
 - **Actuator:** http://localhost:8080/actuator
@@ -169,7 +173,7 @@ curl http://localhost:8080/actuator/health
 curl http://localhost:8080/actuator/health/db
 
 # Check frontend
-curl http://localhost:80
+curl http://localhost:3000
 ```
 
 ### **Troubleshooting:**
@@ -331,7 +335,7 @@ This document includes:
 
 ## 📄 License
 
-This project is licensed under the MIT License. See the [LICENSE](https://github.com/careb36/careb36-BancoCentral-SecLand-Vulnerable/blob/main/LICENCE) file for more details.
+This project is licensed under the MIT License. See the [LICENSE](https://github.com/careb36/CentralBank-SecLand-Vulnerable/blob/main/LICENCE) file for more details.
 
 ---
 

@@ -1,0 +1,65 @@
+Educational Use License
+
+Copyright (c) 2025 SecLand Development Team
+
+EDUCATIONAL USE ONLY - INTENTIONALLY VULNERABLE SOFTWARE
+
+IMPORTANT NOTICE: This software is intentionally designed with security 
+vulnerabilities for educational and research purposes only.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to use
+the Software solely for educational, training, and research purposes, subject
+to the following conditions:
+
+PERMITTED USES:
+1. Educational and academic instruction in cybersecurity
+2. Security research and vulnerability analysis
+3. Training and skills development in ethical hacking
+4. Security awareness demonstrations
+5. Academic research and publications
+
+PROHIBITED USES:
+1. Production deployment of any kind
+2. Commercial use or distribution
+3. Hosting on public networks accessible from the internet
+4. Use against systems without explicit authorization
+5. Any malicious or illegal activities
+
+CONDITIONS:
+1. The above copyright notice and this permission notice shall be included in 
+   all copies or substantial portions of the Software.
+
+2. Users must ensure the Software is only deployed in isolated, controlled 
+   environments with no access to production systems or sensitive data.
+
+3. Users are responsible for securing their testing environments and preventing
+   unauthorized access to the intentionally vulnerable application.
+
+4. Users must comply with all applicable laws, regulations, and institutional
+   policies regarding cybersecurity testing and research.
+
+5. Any derivative works must maintain this license and educational-only
+   restriction.
+
+DISCLAIMER:
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+SECURITY NOTICE:
+This software contains intentional security vulnerabilities including but not
+limited to SQL injection, cross-site scripting, authentication bypass, and
+other OWASP Top 10 vulnerabilities. These vulnerabilities are included for
+educational purposes and must never be deployed in production environments.
+
+The authors and contributors disclaim all responsibility for any misuse of
+this software or any damages resulting from its use. Users assume all risks
+and responsibilities associated with the use of this software.
+
+For questions about licensing or permitted use, contact the project maintainers
+through the official repository channels.

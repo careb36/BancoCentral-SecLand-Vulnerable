@@ -74,33 +74,35 @@ services:
       - "com.secland.description=Spring Boot API for banking operations"
 
   # ===================================================================
-  # FRONTEND TIER - Nginx Web Server
+  # FRONTEND TIER - Next.js Modern Banking Application
   # ===================================================================
   frontend:
     build:
-      context: .
-      dockerfile: Dockerfile.frontend
+      context: ./frontend
+      dockerfile: Dockerfile
     container_name: secland_bank_frontend
     depends_on:
       app:
         condition: service_healthy
     ports:
-      - "80:80"
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://localhost:8080/api
+      - HOSTNAME=0.0.0.0
+      - PORT=3000
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/api/health || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
-      start_period: 10s
+      start_period: 30s
     networks:
       - secland_network
     labels:
       - "com.secland.tier=frontend"
-      - "com.secland.description=Nginx web server serving the banking frontend"
-    environment:
-      - NGINX_HOST=localhost
-      - NGINX_PORT=80
+      - "com.secland.description=Next.js modern banking frontend application"
 
 # =====================================================================
 # VOLUMES - Persistent Data Storage

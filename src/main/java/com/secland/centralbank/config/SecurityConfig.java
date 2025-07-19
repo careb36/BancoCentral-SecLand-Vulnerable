@@ -134,6 +134,10 @@ public class SecurityConfig {
                         // Allow access to error pages
                         .requestMatchers("/error").permitAll()
 
+                        // Allow public access to Swagger UI and OpenAPI docs for educational purposes
+                        // This makes the API documentation accessible for vulnerability testing
+                        .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll()
+
                         // Require any other request to the API to be authenticated.
                         // This rule ensures that endpoints like /api/accounts/transfer are protected.
                         .anyRequest().authenticated()

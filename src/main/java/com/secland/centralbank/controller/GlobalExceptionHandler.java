@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -235,6 +236,40 @@ public class GlobalExceptionHandler {
         log.warn("Access denied: {}", ex.getMessage());
         
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
+    }
+
+    /**
+     * Handles data integrity violations, such as duplicate key constraints.
+     * 
+     * @param ex the data integrity violation exception
+     * @param request the web request
+     * @return structured error response
+     */
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(
+            DataIntegrityViolationException ex, WebRequest request) {
+        
+        String message = "Data integrity violation occurred";
+        
+        // Check if it's a duplicate key violation for username
+        if (ex.getMessage() != null && ex.getMessage().contains("duplicate key value violates unique constraint")) {
+            if (ex.getMessage().contains("username")) {
+                message = "Username already exists. Please choose a different username.";
+            } else {
+                message = "A record with this information already exists.";
+            }
+        }
+        
+        ErrorResponse errorResponse = new ErrorResponse(
+            HttpStatus.CONFLICT.value(),
+            "Conflict",
+            message,
+            request.getDescription(false)
+        );
+
+        log.warn("Data integrity violation: {}", ex.getMessage());
+        
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
     /**

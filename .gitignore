@@ -1,65 +1,129 @@
-# --------------------------------------
-# Compiled output & build directories
-# --------------------------------------
-target/           # Maven default build output
-build/            # Gradle default build output
-out/              # IntelliJ non-Maven/Gradle output
-bin/              # Other build binaries
-
-# Maven specific files that should never be tracked
-target/**         # Everything under target directory
-**/target/**      # Target directories at any level
+# =============================================================================
+# SecLand Banking Application - Git Ignore Configuration
+# =============================================================================
+# Professional .gitignore for Spring Boot + Next.js + Docker monorepo
+# Covers Java, TypeScript, Node.js, Docker, and development environments
+# =============================================================================
 
 # --------------------------------------
-# Package & archive files
+# Backend (Java/Spring Boot/Maven)
 # --------------------------------------
-*.class           # Java bytecode
-*.jar             # Java archives
-*.war             # Web archives
-*.ear             # Enterprise archives
-*.zip             # Distribution packages
-*.tar.gz          # Compressed archives
-*.rar             # Compressed archives
+
+# Compiled Java classes and archives
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+
+# Maven build output
+target/
+**/target/**
+.mvn/wrapper/maven-wrapper.jar
+
+# Build tools and packaging
+*.build/
+build/
+out/
+bin/
+dist/
+
+# Test reports and coverage
+/surefire-reports/
+/failsafe-reports/
+/test-output/
+/jacoco/
+.jacoco/
+coverage/
 
 # --------------------------------------
-# Logs & diagnostic dumps
+# Frontend (Next.js/Node.js/TypeScript)
 # --------------------------------------
-*.log             # Application logs
-*.log.*           # Rotated logs (e.g., .log.1)
-hs_err_pid*.log   # JVM crash dumps
+
+# Dependencies
+node_modules/
+**/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Next.js build output
+.next/
+out/
+build/
+dist/
+
+# Next.js cache and runtime
+.next/cache/
+.swc/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# ESLint cache
+.eslintcache
+
+# Package manager files
+.pnpm-store/
+.yarn/
+.yarnrc.yml
+package-lock.json
+yarn.lock
+
+# Vercel deployment
+.vercel
+
+# Turbo monorepo
+.turbo
 
 # --------------------------------------
-# Test reports & coverage
+# Database & Environment
 # --------------------------------------
-/surefire-reports/    # Maven Surefire
-/failsafe-reports/    # Maven Failsafe
-/test-output/         # Generic test outputs
-/jacoco/              # JaCoCo code coverage
+
+# Environment variables
+.env
+.env.*
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Database dumps
+*.sql.backup
+*.dump
 
 # --------------------------------------
-# Environment files
+# Docker & Containerization
 # --------------------------------------
-.env                # Environment variables file
-.env.*              # Other env variants
+
+# Docker override files
+docker-compose.override.yml
+docker-compose.local.yml
+docker-compose.*.local.yml
+
+# Docker volumes and data
+volumes/
+data/
+postgres-data/
+
+# Container logs
+containers/
 
 # --------------------------------------
-# Docker-related
+# IDE & Editors
 # --------------------------------------
-docker-compose.override.yml   # Local override file
-*.local.yml                   # Alternate compose files
-/.docker/                     # Local Docker build/secret files
-docker-compose*.yml           # Any other compose files
 
-# --------------------------------------
-# IDE & editor metadata
-# --------------------------------------
 # IntelliJ IDEA
 .idea/
 *.iml
-
-# --------------------------------------
-# Any other IDE metadata you don’t want in GitHub
-# --------------------------------------
+*.iws
+*.ipr
 bancocentral.iml
 
 # Eclipse
@@ -71,32 +135,198 @@ bancocentral.iml
 .springBeans
 .sts4-cache/
 
-# VS Code
+# Visual Studio Code
 .vscode/
-/.vscode/*                    # Uncomment to track specific workspace settings
+*.code-workspace
 
 # Cursor IDE
 .cursor/
+.cursorrules
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+\#*\#
+.\#*
 
 # --------------------------------------
-# OS-specific files
+# Operating System Files
 # --------------------------------------
-.DS_Store         # macOS metadata
-Thumbs.db         # Windows Explorer thumbnails
-Desktop.ini       # Windows folder settings
-*.bak             # Backup files
-*.tmp             # Temp files
-*~                # Editor backup files
-*.swp             # Vim swap files
-*.swo             # Vim swap files
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
 
 # --------------------------------------
-# Maven & Gradle wrapper
+# Logs & Debugging
 # --------------------------------------
-.mvn/wrapper/maven-wrapper.jar   # Maven Wrapper binary
-!gradle-wrapper.jar              # Keep Gradle Wrapper jar tracked
+
+# Application logs
+*.log
+*.log.*
+logs/
+log/
+
+# JVM crash dumps
+hs_err_pid*
+replay_pid*
+
+# Node.js debugging
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
 
 # --------------------------------------
-# Local Maven repository (uncomment if accidentally checked in)
+# Security & Secrets
 # --------------------------------------
-/root/.m2/
+
+# Certificates and keys
+*.pem
+*.key
+*.crt
+*.p12
+*.jks
+*.keystore
+*.truststore
+
+# Security scans
+.snyk
+security-report.json
+
+# --------------------------------------
+# Temporary & Cache Files
+# --------------------------------------
+
+# General temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+*.orig
+*.save
+
+# Cache directories
+.cache/
+.parcel-cache/
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Coverage reports
+coverage/
+.nyc_output/
+lcov.info
+
+# --------------------------------------
+# Documentation & Reports
+# --------------------------------------
+
+# Generated documentation
+/docs/api-generated/
+/docs/coverage/
+/site/
+
+# Security reports
+security-audit.json
+vulnerability-report.html
+
+# --------------------------------------
+# Deployment & Production
+# --------------------------------------
+
+# Production builds
+/dist-prod/
+/build-prod/
+
+# Deployment artifacts
+deployment/
+.deploy/
+
+# Kubernetes
+k8s-generated/
+
+# --------------------------------------
+# Development Tools
+# --------------------------------------
+
+# HTTP client files
+*.http
+*.rest
+
+# Profiler output
+*.prof
+
+# Memory dumps
+*.hprof
+*.heap
+
+# Performance monitoring
+perf.data*
+
+# --------------------------------------
+# Project Specific Exclusions
+# --------------------------------------
+
+# Generated password hashes (if any)
+generated-hashes.txt
+
+# Local development overrides
+local-config/
+dev-overrides/
+
+# Test data
+test-data/
+sample-data/
+
+# --------------------------------------
+# Keep These Files (Explicitly Tracked)
+# --------------------------------------
+
+# Maven wrapper (keep these)
+!.mvn/wrapper/maven-wrapper.properties
+!mvnw
+!mvnw.cmd
+
+# Docker base configurations (keep these)
+!Dockerfile
+!docker-compose.yaml
+!.dockerignore
+
+# Essential configuration files
+!package.json
+!pom.xml
+!tsconfig.json
+!next.config.mjs
+!tailwind.config.js
+!components.json
+
+# Documentation
+!README.md
+!docs/*.md
+!LICENSE
+
+# =============================================================================
+# End of .gitignore
+# =============================================================================

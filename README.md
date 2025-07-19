@@ -1,344 +1,295 @@
-# SecLand Central Bank
+# 🏦 SecLand Central Bank - Intentionally Vulnerable Banking Application
 
-This repository contains the source code for **"SecLand Central Bank"**, a **deliberately vulnerable** web banking application built with Spring Boot (Java) and PostgreSQL. The main objective of this project is to serve as a **laboratory for ethical hacking research and practice**, as well as to develop an Artificial Intelligence (AI) based anomaly detection module as part of a Master's Thesis (TFM).
+<div align="center">
 
-> **⚠️ CRITICAL WARNING:** This application contains **intentional vulnerabilities** and is designed **ONLY for educational and research purposes**. **DO NOT use in production or with real data.**
+[![Security Assessment](https://img.shields.io/badge/Security-Intentionally%20Vulnerable-red)](docs/SECURITY.md)
+[![Build Status](https://img.shields.io/badge/Build-Passing-green)](https://github.com/careb36/CentralBank-SecLand-Vulnerable/actions)
+[![Docker](https://img.shields.io/badge/Docker-Ready-blue)](docker-compose.yaml)
+[![License](https://img.shields.io/badge/License-Educational%20Use%20Only-yellow)](LICENSE)
+[![Java](https://img.shields.io/badge/Java-21-orange)](pom.xml)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.3-brightgreen)](pom.xml)
+[![Next.js](https://img.shields.io/badge/Next.js-15.2.4-black)](frontend/package.json)
 
-## 📋 Table of Contents
+</div>
 
-1. [Project Purpose](#-project-purpose)
-2. [Implemented Vulnerabilities](#-implemented-vulnerabilities)
-3. [Implemented Features](#-implemented-features)
-4. [Technologies Used](#️-technologies-used)
-5. [Quick Setup](#-quick-setup)
-6. [API Endpoints](#-api-endpoints)
-7. [Test Data](#-test-data)
-8. [Vulnerability Documentation](#-vulnerability-documentation)
-9. [Educational Use Cases](#-educational-use-cases)
-10. [Ethical Considerations](#️-ethical-considerations)
-11. [License](#-license)
+## 📋 Overview
 
-## 🎯 Project Purpose
+SecLand Central Bank is a **deliberately vulnerable modern banking application** designed for cybersecurity education, ethical hacking practice, and security awareness training. This full-stack application demonstrates common web application vulnerabilities in a realistic banking context.
 
-This project aims to provide a controlled environment for:
+### 🎯 Purpose
 
-- **Performing penetration testing (pentesting)** on common banking functionalities using **Kali Linux**.
-- **Studying and exploiting security vulnerabilities** intentionally introduced in both code and business logic.
-- **Collecting detailed logs** for training and validation of an AI-based anomaly detection model.
-- **Serving as an original research platform** for a Master's Thesis, ensuring no public "solutions" exist for its vulnerabilities.
-- **Educating about security best practices** through comparison of vulnerable vs secure implementations.
+This project serves as a **comprehensive security training platform** featuring:
 
-## 🔍 Implemented Vulnerabilities
+- ✅ **45+ intentional vulnerabilities** spanning OWASP Top 10
+- ✅ **Modern technology stack** (Spring Boot + Next.js + PostgreSQL)
+- ✅ **Realistic banking features** (accounts, transfers, transactions)
+- ✅ **Professional development practices** with security anti-patterns
+- ✅ **Comprehensive documentation** for learning and assessment
+- ✅ **Interactive API documentation** with Swagger/OpenAPI
 
-### **Main Vulnerabilities (OWASP Top 10 2021):**
+## 🚀 Quick Start
 
-#### **A05:2021 - Broken Access Control (IDOR)**
+### Prerequisites
 
-- ✅ **Account creation for any user** - `POST /api/accounts/create`
-- ✅ **Access to other users' accounts** - `GET /api/accounts/user/{username}`
-- ✅ **Transfers from any account** - `POST /api/accounts/transfer`
-- ✅ **Deposits to any account** - `POST /api/accounts/{accountId}/deposit`
-- ✅ **Deletion of any account** - `DELETE /api/accounts/{accountId}`
-- ✅ **Access to transaction history** - `GET /api/accounts/{accountId}/transactions`
+- **Docker & Docker Compose** (recommended)
+- **Java 21+** (for local development)
+- **Node.js 18+** (for frontend development)
+- **Maven 3.9+** (included via wrapper)
 
-#### **A03:2021 - Injection**
-
-- ✅ **SQL Injection in search** - `GET /api/transactions/search?description={query}`
-- ✅ **XSS in transaction descriptions** - Storage of malicious scripts
-
-#### **A07:2021 - Identification and Authentication Failures**
-
-- ✅ **Weak passwords** - No complexity requirements
-- ✅ **No rate limiting** - Unrestricted brute force attacks
-- ✅ **No account lockout** - Unlimited login attempts
-
-#### **A01:2021 - Broken Access Control (Business Logic)**
-
-- ✅ **Negative funds** - Transfers resulting in negative balances
-- ✅ **Unlimited amounts** - No transaction limit validation
-
-### **Additional Vulnerabilities:**
-
-- ✅ **Lack of input sanitization** - Allows code injection
-- ✅ **Insufficient logging** - Lack of security auditing
-- ✅ **Informative error handling** - Exposure of sensitive information
-
-## 🏦 Implemented Features
-
-- **User Management:** Customer registration and authentication.
-- **Account Management:** Creation of Savings and Checking accounts.
-- **Transactions:** Fund transfers between accounts.
-- **RESTful API:** All functionality exposed through a REST API.
-- **Mixed Security:** Combines robust security practices with intentionally introduced vulnerabilities.
-- **Detailed Logging:** Event logging for anomaly analysis.
-
-## 🛠️ Technologies Used
-
-- **Frontend:** Next.js 15.2.4, React 19, TypeScript, Tailwind CSS, Radix UI
-- **Backend:** Java 21, Spring Boot 3, Spring Security, Spring Data JPA
-- **Database:** PostgreSQL 15
-- **Build Tool:** Maven (Backend), pnpm (Frontend)
-- **Containerization:** Docker, Docker Compose
-- **Testing:** JUnit 5, Postman
-- **Attack Platform:** Kali Linux
-- **Pentesting Tools:** Burp Suite, OWASP ZAP, SQLMap
-
-## 🚀 Quick Setup
-
-The project is fully containerized for easy and quick deployment.
-
-### **Prerequisites:**
-
-- [Docker Desktop](https://www.docker.com/products/docker-desktop) (version 24.0.0+)
-- [Git](https://git-scm.com/) (version 2.40.0+)
-- [Java Development Kit (JDK)](https://adoptium.net/) (version 21+) - for local development
-- [Maven](https://maven.apache.org/) (version 3.9.0+) - for local development
-- [Node.js](https://nodejs.org/) (version 18.0.0+) - for frontend development
-
-### **Environment Setup:**
-
-1. **Clone the Repository:**
-```bash
-git clone https://github.com/careb36/BancoCentral-SecLand-Vulnerable.git
-cd BancoCentral-SecLand-Vulnerable
-```
-
-2. **Configure Environment Variables:**
-Create a `.env` file in the root directory:
-```env
-# Database Configuration
-POSTGRES_DB=secland_bank_db
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=password
-
-# JWT Configuration
-JWT_SECRET=your_jwt_secret_key
-JWT_EXPIRATION=86400000  # 24 hours in milliseconds
-
-# Application Ports
-BACKEND_PORT=8080
-FRONTEND_PORT=3000
-DB_PORT=5432
-
-# Frontend Configuration
-NEXT_PUBLIC_API_URL=http://localhost:8080/api
-```
-
-3. **Start the Application:**
-
-Using Docker (recommended for testing):
-```bash
-# Build and start all containers
-docker-compose up --build
-
-# Start in detached mode
-docker-compose up -d
-
-# View logs
-docker-compose logs -f
-
-# Stop all containers
-docker-compose down
-```
-
-For Local Development:
-```bash
-# Backend (Terminal 1)
-# Use Maven Wrapper for consistent build
-./mvnw clean install     # Unix/macOS
-mvnw.cmd clean install   # Windows PowerShell
-./mvnw spring-boot:run   # Unix/macOS
-mvnw.cmd spring-boot:run # Windows PowerShell
-
-# Frontend (Terminal 2)
-cd frontend
-npm install  # or: pnpm install
-npm run dev  # or: pnpm dev
-```
-
-### **Access Points:**
-
-- **Frontend:** http://localhost:3000
-- **Backend API:** http://localhost:8080
-- **Swagger UI:** http://localhost:8080/swagger-ui/index.html
-- **Actuator:** http://localhost:8080/actuator
-
-### **Health Checks:**
+### Using Docker (Recommended)
 
 ```bash
-# Check backend health
-curl http://localhost:8080/actuator/health
+# Clone and start the application
+git clone https://github.com/careb36/CentralBank-SecLand-Vulnerable.git
+cd CentralBank-SecLand-Vulnerable
 
-# Check database connection
-curl http://localhost:8080/actuator/health/db
+# Build and start all services
+docker-compose up -d --build
 
-# Check frontend
-curl http://localhost:3000
+# Access the application
+open http://localhost:3000  # Frontend (Next.js)
+open http://localhost:8080  # Backend API (Spring Boot)
+open http://localhost:8080/swagger-ui.html  # API Documentation
 ```
 
-### **Troubleshooting:**
+### Manual Setup
 
-1. **Port Conflicts:**
-```bash
-# Find and kill processes using ports
-netstat -ano | findstr :8080
-taskkill /PID <PID> /F
+Detailed setup instructions available in [Development Guide](docs/DEVELOPMENT.md).
+
+## 🏗️ Architecture
+
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│                 │    │                 │    │                 │
+│   Frontend      │────│   Backend       │────│   Database      │
+│   (Next.js)     │    │   (Spring Boot) │    │   (PostgreSQL)  │
+│   Port 3000     │    │   Port 8080     │    │   Port 5432     │
+│                 │    │                 │    │                 │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
 ```
 
-2. **Database Issues:**
-```bash
-# Reset the database
-docker-compose down -v
-docker-compose up --build
-```
+### Technology Stack
 
-3. **Clean Build:**
-```bash
-# Clean Maven build
-mvn clean install -U
+| Component | Technology | Version | Purpose |
+|-----------|------------|---------|---------|
+| **Backend** | Spring Boot | 3.5.3 | REST API, Business Logic, Security |
+| **Frontend** | Next.js | 15.2.4 | User Interface, Client-side Logic |
+| **Database** | PostgreSQL | 15 | Data Persistence, Transaction Management |
+| **Authentication** | JWT | - | Token-based Authentication |
+| **Documentation** | Swagger/OpenAPI | 3.0 | Interactive API Documentation |
+| **Containerization** | Docker | - | Application Deployment |
 
-# Clean Docker build
-docker-compose down --rmi all
-docker-compose up --build
-```
+## 🔐 Default Test Credentials
 
-## 🔌 API Endpoints
+> **⚠️ Educational Passwords Only**: All users share weak passwords for demonstration purposes.
 
-### **Authentication (`/api/auth`)**
+| Username | Password | Role | Accounts |
+|----------|----------|------|----------|
+| `testuser` | `password` | Customer | Checking ($2,500), Savings ($1,750) |
+| `admin` | `password` | Administrator | Checking ($10,000), Savings ($25,000) |
+| `carolina_p` | `password` | Customer | Checking ($1,250), Savings ($5,000) |
+| `test_user` | `password` | Customer | Savings ($800) |
 
-#### **Register a new user**
+📖 **Detailed credentials**: [Test Credentials Guide](docs/CREDENTIALS.md)
 
-**Endpoint:** `POST /api/auth/register`
+## 🛡️ Security Features (Intentionally Vulnerable)
 
-**Body:**
-```json
-{
-    "username": "new_user",
-    "password": "a_secure_password",
-    "fullName": "Full Name"
-}
-```
+This application contains **45+ intentional security vulnerabilities** including:
 
-#### **Login**
+### 🔴 Authentication & Authorization
+- **Weak Password Policy** (CWE-521)
+- **JWT Token Exposure** (CWE-522)
+- **Session Management Issues** (CWE-384)
+- **Privilege Escalation** (CWE-269)
 
-**Endpoint:** `POST /api/auth/login`
+### 🔴 Input Validation & Injection
+- **SQL Injection** (CWE-89)
+- **Cross-Site Scripting (XSS)** (CWE-79)
+- **Path Traversal** (CWE-22)
+- **Command Injection** (CWE-78)
 
-**Body:**
-```json
-{
-    "username": "existing_user",
-    "password": "your_password"
-}
-```
+### 🔴 Business Logic & Data
+- **Insecure Direct Object References (IDOR)** (CWE-639)
+- **Race Conditions** (CWE-362)
+- **Business Logic Bypass** (CWE-840)
+- **Sensitive Data Exposure** (CWE-200)
 
-### **Accounts (`/api/accounts`)**
+### 🔴 Configuration & Infrastructure
+- **Security Misconfiguration** (CWE-16)
+- **Insecure Cryptographic Storage** (CWE-312)
+- **Insufficient Logging** (CWE-778)
+- **CORS Misconfiguration** (CWE-942)
 
-#### **Make a transfer**
+📖 **Complete vulnerability analysis**: [Security Assessment](docs/SECURITY.md)
 
-**Endpoint:** `POST /api/accounts/transfer`
+## 📚 Documentation
 
-**Body:**
-```json
-{
-    "fromAccountId": 101,
-    "toAccountNumber": "SEC1-87654321",
-    "amount": 500.00,
-    "description": "Test transfer"
-}
-```
-
-#### **Create an account**
-
-**Endpoint:** `POST /api/accounts/create`
-
-**Body:**
-```json
-{
-    "username": "target_user",
-    "accountType": "Savings",
-    "initialDeposit": 1000.00
-}
-```
-
-#### **Deposit money**
-
-**Endpoint:** `POST /api/accounts/{accountId}/deposit`
-
-**Body:**
-```json
-{
-    "amount": 250.00
-}
-```
-
-## 📊 Test Data
-
-The database is initialized with the following users and accounts for testing:
-
-| Entity | ID | Details |
-|--------|----|---------------------------------------------------------|
-| User   | 1  | `username`: **carolina_p**, `password`: **password123** |
-| User   | 2  | `username`: **test_user**, `password`: **testpass**     |
-| Account| 101| Type: Savings, Balance: 5000.75, Owner: `carolina_p`   |
-| Account| 102| Type: Checking, Balance: 1250.00, Owner: `carolina_p`  |
-| Account| 201| Type: Savings, Balance: 800.50, Owner: `test_user`     |
-
-## 📚 Vulnerability Documentation
-
-For a complete guide on implemented vulnerabilities, practice scenarios, and exploitation techniques, see:
-
-**[📖 VULNERABILITIES.md](VULNERABILITIES.md)**
-
-This document includes:
-- ✅ Detailed description of each vulnerability
-- ✅ Exploitation examples with curl commands
-- ✅ Step-by-step practice scenarios
-- ✅ Comparison with secure implementations
-- ✅ Recommended pentesting tools
-- ✅ Ethical considerations and responsible use
+| Document | Purpose |
+|----------|---------|
+| [🔧 Development Guide](docs/DEVELOPMENT.md) | Setup, configuration, and development workflow |
+| [📡 API Documentation](docs/API.md) | REST API endpoints and usage examples |
+| [🛡️ Security Assessment](docs/SECURITY.md) | Comprehensive vulnerability analysis |
+| [🔐 Test Credentials](docs/CREDENTIALS.md) | Default users and login information |
 
 ## 🎓 Educational Use Cases
 
-### **For Security Students:**
-
-- Learn exploitation techniques in a safe environment
-- Practice vulnerability reporting
+### For Students
+- Learn about common web application vulnerabilities
+- Practice secure coding techniques
 - Understand the impact of security flaws
+- Explore modern development frameworks
 
-### **For Researchers:**
+### For Instructors
+- Demonstrate real-world vulnerability examples
+- Teach defensive programming practices
+- Assess student security knowledge
+- Provide hands-on cybersecurity training
 
-- Develop anomaly detection tools
-- Study attack patterns
-- Validate mitigation techniques
+### For Security Professionals
+- Practice penetration testing techniques
+- Develop security testing methodologies
+- Train junior security analysts
+- Research AI-based anomaly detection
 
-### **For Professors:**
+## 🔍 Testing & Exploitation
 
-- Demonstrate security concepts in class
-- Assign practical pentesting exercises
-- Evaluate security analysis skills
+### Recommended Tools
+- **OWASP ZAP** - Automated vulnerability scanning
+- **Burp Suite** - Manual security testing
+- **sqlmap** - SQL injection testing
+- **Postman** - API testing and exploration
+- **Browser Developer Tools** - Client-side analysis
 
-## ⚖️ Ethical Considerations
+### Testing Workflow
+1. **Reconnaissance**: Explore the application functionality
+2. **Automated Scanning**: Use tools like OWASP ZAP
+3. **Manual Testing**: Verify and exploit vulnerabilities
+4. **Privilege Escalation**: Attempt to gain admin access
+5. **Data Extraction**: Test for sensitive data exposure
+6. **Documentation**: Record findings and impact
 
-### **Acceptable Use:**
+## 🚦 API Endpoints
 
-- ✅ Security learning and education
-- ✅ Academic research
-- ✅ Pentesting practice in controlled environments
-- ✅ Development of defense tools
+### Authentication
+- `POST /api/auth/login` - User authentication
+- `POST /api/auth/register` - User registration
 
-### **Unacceptable Use:**
+### Account Management
+- `GET /api/accounts` - List user accounts
+- `POST /api/accounts/create` - Create new account
+- `POST /api/accounts/{id}/deposit` - Deposit funds
+- `DELETE /api/accounts/{id}` - Delete account
 
-- ❌ Use in production systems
-- ❌ Use with real user data
-- ❌ Malicious or illegal activities
-- ❌ Sharing exploits without educational context
+### Transactions
+- `POST /api/accounts/transfer` - Transfer money
+- `GET /api/accounts/{id}/transactions` - Transaction history
 
-## 📄 License
+### Administrative (Vulnerable)
+- `GET /api/accounts/user/{username}` - Get user accounts (IDOR)
 
-This project is licensed under the MIT License. See the [LICENSE](https://github.com/careb36/CentralBank-SecLand-Vulnerable/blob/main/LICENCE) file for more details.
+🔗 **Interactive API Documentation**: http://localhost:8080/swagger-ui.html
+
+## 📦 Project Structure
+
+```
+CentralBank-SecLand-Vulnerable/
+├── 🐋 docker-compose.yaml           # Container orchestration
+├── 🐋 Dockerfile                    # Backend container
+├── 📄 pom.xml                       # Maven configuration
+├── 📄 README.md                     # This file
+├── 📁 docs/                         # Documentation
+│   ├── 📄 API.md                    # API documentation
+│   ├── 📄 CREDENTIALS.md            # Test credentials
+│   ├── 📄 DEVELOPMENT.md            # Development guide
+│   └── 📄 SECURITY.md               # Security assessment
+├── 📁 src/                          # Backend source code
+│   ├── 📁 main/java/                # Java source files
+│   ├── 📁 main/resources/           # Configuration & SQL
+│   └── 📁 test/java/                # Test files
+├── 📁 frontend/                     # Frontend application
+│   ├── 📁 app/                      # Next.js pages
+│   ├── 📁 components/               # React components
+│   ├── 📁 lib/                      # Utilities
+│   ├── 📁 hooks/                    # Custom hooks
+│   └── 📄 package.json              # Frontend dependencies
+└── 📁 scripts/                      # Development scripts
+```
+
+## 🤝 Contributing
+
+This is an educational project. Contributions that add new vulnerabilities or improve the learning experience are welcome.
+
+### Guidelines
+1. **Maintain Educational Value**: All changes should serve educational purposes
+2. **Document Vulnerabilities**: New vulnerabilities must be documented
+3. **Professional Code Quality**: Follow existing code standards
+4. **Test Coverage**: Include appropriate tests
+5. **Security Warnings**: Clearly mark vulnerable code sections
+
+## ⚠️ Important Disclaimers
+
+### 🚨 SECURITY WARNING
+**This application is intentionally vulnerable and must NEVER be used in production environments.**
+
+### Legal and Ethical Use
+- ✅ **Authorized testing environments only**
+- ✅ **Educational and research purposes**
+- ✅ **Follow responsible disclosure practices**
+- ❌ **No unauthorized testing on third-party systems**
+- ❌ **No deployment in production environments**
+- ❌ **No use for malicious purposes**
+
+### Educational Context
+This application is developed for:
+- Cybersecurity education and training
+- Academic research purposes
+- Ethical hacking practice
+- Security awareness demonstrations
+
+## 📜 License
+
+This project is licensed under the Educational Use Only License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- Spring Boot team for the excellent framework
+- Next.js team for the modern React framework
+- OWASP for security vulnerability classifications
+- Security research community for vulnerability patterns
 
 ---
 
-> **⚠️ FINAL WARNING:** This application contains intentional vulnerabilities and is designed solely for educational purposes. **DO NOT use in production or with real data.**
+<div align="center">
+<strong>⚠️ FOR EDUCATIONAL PURPOSES ONLY ⚠️</strong><br>
+<em>Never deploy this application in production environments</em>
+</div>
 
-> **🎯 Objective:** Learn from vulnerabilities to build more secure applications.
+### Liability
+The authors and contributors are not responsible for any misuse of this application. Users must comply with applicable laws and regulations.
+
+## 🤝 Contributing
+
+Contributions are welcome! Please read our contribution guidelines:
+
+1. Fork the repository
+2. Create a feature branch
+3. Follow coding standards
+4. Add comprehensive tests
+5. Update documentation
+6. Submit a pull request
+
+## 📞 Support
+
+- 📖 **Documentation**: Check the [docs/](docs/) directory
+- 🐛 **Issues**: [GitHub Issues](https://github.com/careb36/CentralBank-SecLand-Vulnerable/issues)
+- 💬 **Discussions**: [GitHub Discussions](https://github.com/careb36/CentralBank-SecLand-Vulnerable/discussions)
+
+## 📜 License
+
+This project is licensed for **Educational Use Only**. See [LICENSE](LICENSE) for details.
+
+---
+
+**🎯 Learning Objective**: Understand web application security through hands-on experience with real vulnerabilities in a safe, controlled environment.
+
+**⭐ Star this repository** if you find it useful for your security education journey! 

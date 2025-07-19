@@ -34,10 +34,10 @@ public class Transaction {
     /**
      * Identifier of the account from which funds are withdrawn.
      * <p>
-     * Must reference a valid {@code Account} ID.
+     * Must reference a valid {@code Account} ID, or null for external deposits.
      * </p>
      */
-    @Column(name = "source_account_id", nullable = false)
+    @Column(name = "source_account_id", nullable = true)
     private Long sourceAccountId;
 
     /**

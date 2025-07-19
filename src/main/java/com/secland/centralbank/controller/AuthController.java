@@ -1,5 +1,12 @@
 package com.secland.centralbank.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -41,10 +48,14 @@ import jakarta.validation.Valid;
  *   <li>JWT token-based authentication</li>
  *   <li>Input validation and sanitization</li>
  *   <li>Comprehensive error handling</li>
- *   <li>Audit logging for security events</li>
  * </ul>
  * </p>
  */
+@Tag(
+    name = "Authentication", 
+    description = "Authentication and user registration endpoints. " +
+                 "⚠️ Contains intentional security vulnerabilities for educational purposes."
+)
 @RestController
 @RequestMapping("/api/auth")
 @Validated
@@ -67,17 +78,96 @@ public class AuthController {
         this.jwtUtil = jwtUtil;
     }
 
-    /**
+        /**
      * Registers a new user in the system.
      * <p>
      * Creates a new user account with hashed password and returns the created user.
-     * This endpoint implements secure password handling using BCrypt hashing.
+     * <strong>Educational Note:</strong> Contains weak password validation vulnerabilities.
      * </p>
-     *
-     * @param registerUserDto DTO containing user registration information
-     * @return {@code 201 Created} with the registered user if successful;
-     *         {@code 400 Bad Request} if validation fails or user already exists
+     * 
+     * @param registerUserDto the user registration data
+     * @return the created user information
      */
+    @Operation(
+        summary = "Register a new user",
+        description = "Creates a new user account in the banking system. " +
+                     "⚠️ Educational vulnerability: Weak password validation allows insecure passwords.",
+        requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "User registration information",
+            required = true,
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = RegisterUserDto.class),
+                examples = @ExampleObject(
+                    name = "User Registration Example",
+                    value = """
+                        {
+                          "username": "johndoe",
+                          "password": "password123",
+                          "fullName": "John Doe"
+                        }
+                        """
+                )
+            )
+        )
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "201",
+            description = "User successfully registered",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = User.class),
+                examples = @ExampleObject(
+                    name = "Successful Registration",
+                    value = """
+                        {
+                          "id": 1,
+                          "username": "johndoe",
+                          "fullName": "John Doe",
+                          "createdAt": "2025-07-19T10:00:00Z"
+                        }
+                        """
+                )
+            )
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Invalid input data or validation errors",
+            content = @Content(
+                mediaType = "application/json",
+                examples = @ExampleObject(
+                    name = "Validation Error",
+                    value = """
+                        {
+                          "timestamp": "2025-07-19T10:00:00Z",
+                          "status": 400,
+                          "error": "Bad Request",
+                          "message": "Username must be between 3 and 50 characters"
+                        }
+                        """
+                )
+            )
+        ),
+        @ApiResponse(
+            responseCode = "409",
+            description = "Username already exists",
+            content = @Content(
+                mediaType = "application/json",
+                examples = @ExampleObject(
+                    name = "Username Conflict",
+                    value = """
+                        {
+                          "timestamp": "2025-07-19T10:00:00Z",
+                          "status": 409,
+                          "error": "Conflict",
+                          "message": "Username 'johndoe' is already taken"
+                        }
+                        """
+                )
+            )
+        )
+    })
     @PostMapping("/register")
     public ResponseEntity<User> register(@Valid @RequestBody RegisterUserDto registerUserDto) {
         log.info("User registration initiated for username: {}", registerUserDto.getUsername());
@@ -96,15 +186,95 @@ public class AuthController {
     /**
      * Authenticates a user and generates a JWT token.
      * <p>
-     * Performs secure authentication using Spring Security's AuthenticationManager
-     * and generates a JWT token for subsequent API access. This endpoint implements
-     * proper authentication practices with comprehensive error handling.
+     * <strong>Educational vulnerabilities:</strong> Logs credentials in plaintext,
+     * provides verbose error messages, and has no rate limiting.
      * </p>
      *
      * @param loginRequestDto DTO containing login credentials
      * @return {@code 200 OK} with JWT token and user information if successful;
      *         {@code 401 Unauthorized} if credentials are invalid
      */
+    @Operation(
+        summary = "User login",
+        description = "Authenticates user credentials and returns a JWT token for API access. " +
+                     "⚠️ Educational vulnerabilities: Credential logging, verbose errors, no rate limiting.",
+        requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "User login credentials",
+            required = true,
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = LoginRequestDto.class),
+                examples = @ExampleObject(
+                    name = "Login Example",
+                    value = """
+                        {
+                          "username": "testuser",
+                          "password": "password123"
+                        }
+                        """
+                )
+            )
+        )
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Login successful - JWT token generated",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = LoginResponseDto.class),
+                examples = @ExampleObject(
+                    name = "Successful Login",
+                    value = """
+                        {
+                          "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                          "user": {
+                            "id": 1,
+                            "username": "testuser",
+                            "fullName": "Test User"
+                          }
+                        }
+                        """
+                )
+            )
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Invalid request format or missing fields",
+            content = @Content(
+                mediaType = "application/json",
+                examples = @ExampleObject(
+                    name = "Bad Request",
+                    value = """
+                        {
+                          "timestamp": "2025-07-19T10:00:00Z",
+                          "status": 400,
+                          "error": "Bad Request",
+                          "message": "Username and password are required"
+                        }
+                        """
+                )
+            )
+        ),
+        @ApiResponse(
+            responseCode = "401",
+            description = "Invalid credentials - authentication failed",
+            content = @Content(
+                mediaType = "application/json",
+                examples = @ExampleObject(
+                    name = "Invalid Credentials",
+                    value = """
+                        {
+                          "timestamp": "2025-07-19T10:00:00Z",
+                          "status": 401,
+                          "error": "Unauthorized",
+                          "message": "Invalid username or password"
+                        }
+                        """
+                )
+            )
+        )
+    })
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> login(@Valid @RequestBody LoginRequestDto loginRequestDto) {
         log.info("Login attempt for user: {}", loginRequestDto.getUsername());

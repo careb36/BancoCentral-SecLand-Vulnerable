@@ -120,16 +120,18 @@ This application contains **45+ intentional security vulnerabilities** including
 - **Insufficient Logging** (CWE-778)
 - **CORS Misconfiguration** (CWE-942)
 
-📖 **Complete vulnerability analysis**: [Security Assessment](docs/SECURITY.md)
+📖 **Complete vulnerability analysis**: [Security Vulnerabilities](docs/security/VULNERABILITIES.md)
 
 ## 📚 Documentation
 
 | Document | Purpose |
 |----------|---------|
-| [🔧 Development Guide](docs/DEVELOPMENT.md) | Setup, configuration, and development workflow |
-| [📡 API Documentation](docs/API.md) | REST API endpoints and usage examples |
-| [🛡️ Security Assessment](docs/SECURITY.md) | Comprehensive vulnerability analysis |
-| [🔐 Test Credentials](docs/CREDENTIALS.md) | Default users and login information |
+| [� Documentation Index](docs/README.md) | Complete documentation overview |
+| [🚨 Security Vulnerabilities](docs/security/VULNERABILITIES.md) | 45+ vulnerabilities catalog |
+| [🧪 Testing Guide](docs/security/TESTING.md) | Exploitation procedures and tools |
+| [� API Reference](docs/development/API.md) | Complete REST API documentation |
+| [� Docker Guide](docs/deployment/DOCKER.md) | Container deployment guide |
+| [� Development Guide](DEVELOPMENT.md) | Local development setup |
 
 ## 🎓 Educational Use Cases
 

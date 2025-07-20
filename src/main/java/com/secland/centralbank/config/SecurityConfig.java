@@ -81,10 +81,11 @@ public class SecurityConfig {
         // 3. Explicitly list required headers
         // 4. Consider if credentials are really needed
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(Arrays.asList("*")); // VULN: Allows any origin
+        // Changed to use allowedOriginPatterns with specific patterns for educational vulnerability
+        configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:*", "http://127.0.0.1:*", "file://*")); // VULN: Still allows local origins for testing
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS")); // VULN: All methods allowed
         configuration.setAllowedHeaders(Arrays.asList("*")); // VULN: All headers allowed
-        configuration.setAllowCredentials(true); // VULN: Allows credentials from any origin
+        configuration.setAllowCredentials(true); // VULN: Allows credentials from specified origins
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

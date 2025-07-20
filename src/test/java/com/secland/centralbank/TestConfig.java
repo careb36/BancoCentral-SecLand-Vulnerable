@@ -1,9 +1,7 @@
 package com.secland.centralbank;
 
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -25,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
  * - Test profile activation
  * </p>
  */
-@ExtendWith(SpringExtension.class)
 @SpringBootTest(
     classes = BancoCentralSecLandApplication.class,
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT

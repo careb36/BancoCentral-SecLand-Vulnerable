@@ -1,5 +1,6 @@
 package com.secland.centralbank.util;
 
+import com.secland.centralbank.config.JwtProperties;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -15,8 +16,19 @@ import java.util.function.Function;
 @Component
 public class JwtUtil {
 
-    private static final String SECRET_KEY_STRING = "secretsecretsecretsecretsecret12"; // mínimo 256 bits para HS256
-    private static final SecretKey KEY = Keys.hmacShaKeyFor(SECRET_KEY_STRING.getBytes());
+    private final SecretKey key;
+    private final long expiration;
+
+    public JwtUtil(JwtProperties jwtProperties) {
+        this.expiration = jwtProperties.getExpiration();
+        // Ensure the secret is at least 256 bits for HS256
+        String secret = jwtProperties.getSecret();
+        if (secret.length() < 32) {
+            // Pad the secret to meet minimum length requirement
+            secret = secret + "0123456789abcdef0123456789abcdef".substring(secret.length());
+        }
+        this.key = Keys.hmacShaKeyFor(secret.getBytes());
+    }
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -33,7 +45,7 @@ public class JwtUtil {
 
     private Claims extractAllClaims(String token) {
         return Jwts.parser()
-                .verifyWith(KEY)
+                .verifyWith(key)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
@@ -55,8 +67,8 @@ public class JwtUtil {
                 .claims(claims)
                 .subject(subject)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 hours
-                .signWith(KEY)
+                .expiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(key)
                 .compact();
     }
 

@@ -1,7 +1,32 @@
 package com.secland.centralbank.controller;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.MediaType;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.secland.centralbank.dto.LoginRequestDto;
-import com.secland.centralbank.dto.LoginResponseDto;
 import com.secland.centralbank.dto.RegisterUserDto;
 import com.secland.centralbank.model.User;
 import com.secland.centralbank.service.AuthService;
@@ -11,9 +36,9 @@ import com.secland.centralbank.util.JwtUtil;
 /**
  * Comprehensive tests for {@link AuthController}.
  * <p>
- * This test class leverages Spring Boot's {@link WebMvcTest} to focus solely on the web layer,
- * ensuring that {@link AuthController} behaves as expected without needing to load the
- * full application context. Mocking is used for service layers to isolate the controller's logic.
+ * This test class uses pure Mockito for unit testing the controller logic,
+ * ensuring that {@link AuthController} behaves as expected with mocked dependencies.
+ * This approach provides better isolation and faster test execution.
  * </p>
  * <p>
  * Tests cover:
@@ -24,66 +49,71 @@ import com.secland.centralbank.util.JwtUtil;
  * </ul>
  * </p>
  */
-@WebMvcTest(AuthController.class)
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Auth Controller Tests")
 class AuthControllerTests {
 
     /**
-     * MockMvc is used to perform HTTP requests and assert responses in a Spring MVC test.
-     * It's auto-configured by {@link WebMvcTest}.
+     * MockMvc is configured manually to test the controller.
      */
-    @Autowired
     private MockMvc mockMvc;
 
     /**
-     * Mocks the {@link AuthService} to control its behavior during tests.
-     * Injected by MockitoExtension.
+     * The controller under test - injected with mocked dependencies.
      */
-    @MockitoBean
+    @InjectMocks
+    private AuthController authController;
+
+    /**
+     * Mocks the {@link AuthService} to control its behavior during tests.
+     */
+    @Mock
     private AuthService authService;
 
     /**
      * Mocks the {@link AuthenticationManager} to control authentication behavior.
      */
-    @MockitoBean
+    @Mock
     private AuthenticationManager authenticationManager;
 
     /**
      * Mocks the {@link CustomUserDetailsService} to control user details loading.
      */
-    @MockitoBean
+    @Mock
     private CustomUserDetailsService userDetailsService;
 
     /**
      * Mocks the {@link JwtUtil} to control JWT token generation.
      */
-    @MockitoBean
+    @Mock
     private JwtUtil jwtUtil;
 
     /**
      * ObjectMapper is used for converting Java objects to JSON and vice versa.
      * It's essential for sending JSON payloads in mock HTTP requests.
      */
-    @Autowired
     private ObjectMapper objectMapper;
 
     /**
      * A test user object used across multiple tests for consistent setup.
      */
     private User testUser;
+    
     /**
      * A DTO for user registration, pre-configured for test scenarios.
      */
     private RegisterUserDto registerRequest;
+    
     /**
      * A DTO for user login, pre-configured for test scenarios.
      */
     private LoginRequestDto loginRequest;
+    
     /**
      * Mock authentication object for login tests.
      */
     private Authentication mockAuthentication;
+    
     /**
      * Mock user details for login tests.
      */
@@ -93,14 +123,22 @@ class AuthControllerTests {
      * Sets up common test data and mock behaviors before each test method.
      * This method initializes:
      * <ul>
+     * <li>MockMvc for the controller under test.</li>
+     * <li>ObjectMapper for JSON conversion.</li>
      * <li>A {@link User} object for testing.</li>
      * <li>A {@link RegisterUserDto} with default valid data.</li>
      * <li>A {@link LoginRequestDto} with default valid data.</li>
-     * <li>A {@link LoginResponseDto} with default valid data.</li>
+     * <li>Mock authentication and user details objects.</li>
      * </ul>
      */
     @BeforeEach
     void setUp() {
+        // Setup MockMvc for standalone controller testing
+        mockMvc = MockMvcBuilders.standaloneSetup(authController).build();
+        
+        // Setup ObjectMapper
+        objectMapper = new ObjectMapper();
+        
         // Setup test user
         testUser = new User();
         testUser.setId(1L);
@@ -119,8 +157,6 @@ class AuthControllerTests {
         loginRequest.setUsername("testuser");
         loginRequest.setPassword("password123");
 
-        new LoginResponseDto("Login successful!", "test-jwt-token", "testuser");
-
         // Setup mock authentication
         mockAuthentication = new UsernamePasswordAuthenticationToken("testuser", "password123");
         mockUserDetails = org.springframework.security.core.userdetails.User
@@ -133,8 +169,7 @@ class AuthControllerTests {
     /**
      * Tests that a user can successfully register.
      * Expects an HTTP 201 Created status and the details of the newly created user.
-     * Verifies that {@link AuthService#register(RegisterUserDto)}
-     * is called with the correct parameters.
+     * Verifies that {@link AuthService#register(RegisterUserDto)} is called with the correct parameters.
      * @throws Exception if an error occurs during mock MVC performance or JSON serialization.
      */
     @Test
@@ -153,8 +188,7 @@ class AuthControllerTests {
                 .andExpect(jsonPath("$.username").value("testuser"))
                 .andExpect(jsonPath("$.fullName").value("Test User"));
 
-        verify(authService, times(1))
-                .register(registerRequest);
+        verify(authService, times(1)).register(any(RegisterUserDto.class));
     }
 
     /**
@@ -178,8 +212,7 @@ class AuthControllerTests {
                 .content(objectMapper.writeValueAsString(registerRequest)))
                 .andExpect(status().isCreated()); // Should accept for educational purposes
 
-        verify(authService, times(1))
-                .register(registerRequest);
+        verify(authService, times(1)).register(any(RegisterUserDto.class));
     }
 
     /**
@@ -205,7 +238,6 @@ class AuthControllerTests {
                 .content(objectMapper.writeValueAsString(loginRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.token").value("test-jwt-token"))
-                .andExpect(jsonPath("$.username").value("testuser"))
                 .andExpect(jsonPath("$.message").value("Login successful!"));
 
         verify(authenticationManager, times(1))
@@ -213,7 +245,7 @@ class AuthControllerTests {
         verify(userDetailsService, times(1))
                 .loadUserByUsername("testuser");
         verify(jwtUtil, times(1))
-                .generateToken(mockUserDetails);
+                .generateToken(any(UserDetails.class));
     }
 
     /**

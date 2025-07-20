@@ -110,6 +110,13 @@
             <optional>true</optional>
         </dependency>
         
+        <!-- Spring Boot Configuration Processor for generating metadata -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+        
         <!-- Spring Security for authentication and authorization -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -205,6 +212,11 @@
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
                             <version>${lombok.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-configuration-processor</artifactId>
+                            <version>${spring-boot.version}</version>
                         </path>
                     </annotationProcessorPaths>
                 </configuration>

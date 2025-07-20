@@ -1,9 +1,32 @@
 package com.secland.centralbank.controller;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import java.math.BigDecimal;
 import java.util.Collections;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.secland.centralbank.dto.CreateAccountRequestDto;
-import com.secland.centralbank.dto.TransferRequestDto;
+import com.secland.centralbank.dto.FrontendTransferRequestDto;
 import com.secland.centralbank.model.Account;
 import com.secland.centralbank.model.Transaction;
 import com.secland.centralbank.model.User;
@@ -27,64 +50,74 @@ import com.secland.centralbank.service.TransactionService;
  * </ul>
  * </p>
  */
-@WebMvcTest(AccountController.class)
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Account Controller Tests")
 class AccountControllerTests {
 
     /**
-     * MockMvc is used to perform HTTP requests and assert responses in a Spring MVC test.
-     * It's auto-configured by {@link WebMvcTest}.
+     * MockMvc is configured manually to test the controller.
      */
-    @Autowired
     private MockMvc mockMvc;
 
     /**
-     * Mocks the {@link AccountService} to control its behavior during tests.
-     * Injected by MockitoExtension.
+     * The controller under test - injected with mocked dependencies.
      */
-    @MockitoBean
+    @InjectMocks
+    private AccountController accountController;
+
+    /**
+     * Mocks the {@link AccountService} to control its behavior during tests.
+     */
+    @Mock
     private AccountService accountService;
 
     /**
      * Mocks the {@link TransactionService} to control its behavior during tests.
-     * Injected by MockitoExtension.
      */
-    @MockitoBean
+    @Mock
     private TransactionService transactionService;
 
     /**
      * ObjectMapper is used for converting Java objects to JSON and vice versa.
      * It's essential for sending JSON payloads in mock HTTP requests.
      */
-    @Autowired
     private ObjectMapper objectMapper;
 
     /**
      * A test account object used across multiple tests for consistent setup.
      */
     private Account testAccount;
+    
     /**
      * A DTO for creating an account, pre-configured for test scenarios.
      */
     private CreateAccountRequestDto createAccountRequest;
+    
     /**
      * A DTO for performing a transfer, pre-configured for test scenarios.
      */
-    private TransferRequestDto transferRequest;
+    private FrontendTransferRequestDto transferRequest;
 
     /**
      * Sets up common test data and mock behaviors before each test method.
      * This method initializes:
      * <ul>
+     * <li>MockMvc for the controller under test.</li>
+     * <li>ObjectMapper for JSON conversion.</li>
      * <li>A {@link User} object (local to this method as it's only used for account setup).</li>
      * <li>An {@link Account} object associated with the test user.</li>
      * <li>A {@link CreateAccountRequestDto} with default valid data.</li>
-     * <li>A {@link TransferRequestDto} with default valid data.</li>
+     * <li>A {@link FrontendTransferRequestDto} with default valid data.</li>
      * </ul>
      */
     @BeforeEach
     void setUp() {
+        // Setup MockMvc for standalone controller testing
+        mockMvc = MockMvcBuilders.standaloneSetup(accountController).build();
+        
+        // Setup ObjectMapper
+        objectMapper = new ObjectMapper();
+        
         User testUser = new User();
         testUser.setId(1L);
         testUser.setUsername("testuser");
@@ -101,8 +134,9 @@ class AccountControllerTests {
         createAccountRequest.setAccountType("Checking");
         createAccountRequest.setInitialDeposit(new BigDecimal("100.00"));
 
-        transferRequest = new TransferRequestDto();
-        transferRequest.setDestinationAccountId(101L);
+        transferRequest = new FrontendTransferRequestDto();
+        transferRequest.setFromAccountId(101L);
+        transferRequest.setToAccountNumber("SEC1-87654321");
         transferRequest.setAmount(new BigDecimal("500.00"));
         transferRequest.setDescription("Test Transfer");
     }
@@ -114,7 +148,6 @@ class AccountControllerTests {
      * @throws Exception if an error occurs during mock MVC performance.
      */
     @Test
-    @WithMockUser(username = "testuser")
     @DisplayName("Get User Accounts - Success")
     void getUserAccounts_whenLoggedIn_shouldReturnAccounts() throws Exception {
         when(accountService.getUserAccounts()).thenReturn(Collections.singletonList(testAccount));
@@ -134,10 +167,10 @@ class AccountControllerTests {
     }
 
     @Test
-    @WithMockUser(username = "testuser")
     @DisplayName("Create Account - Success")
     void createAccount_whenValid_shouldReturnCreated() throws Exception {
-        when(accountService.createAccount(any(CreateAccountRequestDto.class))).thenReturn(testAccount);
+        when(accountService.createAccountForUser(any(String.class), any(String.class), any(BigDecimal.class)))
+                .thenReturn(testAccount);
 
         mockMvc.perform(post("/api/accounts/create")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -145,15 +178,15 @@ class AccountControllerTests {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.accountNumber").value(testAccount.getAccountNumber()));
 
-        verify(accountService, times(1)).createAccount(any(CreateAccountRequestDto.class));
+        verify(accountService, times(1)).createAccountForUser(any(String.class), any(String.class), any(BigDecimal.class));
     }
 
     @Test
-    @WithMockUser(username = "testuser")
     @DisplayName("Create Account - For Another User (IDOR)")
     void createAccount_forAnotherUser_shouldSucceed() throws Exception {
         createAccountRequest.setUsername("anotheruser");
-        when(accountService.createAccount((CreateAccountRequestDto) any(CreateAccountRequestDto.class))).thenReturn(testAccount);
+        when(accountService.createAccountForUser(any(String.class), any(String.class), any(BigDecimal.class)))
+                .thenReturn(testAccount);
 
         mockMvc.perform(post("/api/accounts/create")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -162,7 +195,6 @@ class AccountControllerTests {
     }
 
     @Test
-    @WithMockUser(username = "testuser")
     @DisplayName("Transfer Money - Success")
     void transferMoney_whenValid_shouldReturnTransaction() throws Exception {
         Transaction mockTransaction = new Transaction();
@@ -170,7 +202,8 @@ class AccountControllerTests {
         mockTransaction.setAmount(transferRequest.getAmount());
         mockTransaction.setDescription(transferRequest.getDescription());
 
-        when(transactionService.performTransfer(any(TransferRequestDto.class))).thenReturn(mockTransaction);
+        when(transactionService.performFrontendTransfer(any(FrontendTransferRequestDto.class)))
+                .thenReturn(mockTransaction);
 
         mockMvc.perform(post("/api/accounts/transfer")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -178,29 +211,28 @@ class AccountControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L));
 
-        verify(transactionService, times(1)).performTransfer(any(TransferRequestDto.class));
+        verify(transactionService, times(1)).performFrontendTransfer(any(FrontendTransferRequestDto.class));
     }
 
     @Test
-    @WithMockUser(username = "attacker")
     @DisplayName("Transfer Money - From Another User's Account (IDOR)")
     void transferMoney_fromAnotherUser_shouldSucceed() throws Exception {
-        transferRequest.setDestinationAccountId(999L); // An account not owned by 'attacker'
+        transferRequest.setFromAccountId(999L); // An account not owned by 'attacker'
         Transaction mockTransaction = new Transaction();
         mockTransaction.setId(2L);
 
-        when(transactionService.performTransfer(any(TransferRequestDto.class))).thenReturn(mockTransaction);
+        when(transactionService.performFrontendTransfer(any(FrontendTransferRequestDto.class)))
+                .thenReturn(mockTransaction);
 
         mockMvc.perform(post("/api/accounts/transfer")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(transferRequest)))
                 .andExpect(status().isOk());
 
-        verify(transactionService, times(1)).performTransfer(any(TransferRequestDto.class));
+        verify(transactionService, times(1)).performFrontendTransfer(any(FrontendTransferRequestDto.class));
     }
 
     @Test
-    @WithMockUser(username = "testuser")
     @DisplayName("Transfer Money - Invalid Amount")
     void transferMoney_withInvalidAmount_shouldReturnBadRequest() throws Exception {
         transferRequest.setAmount(new BigDecimal("-100.00"));
@@ -210,6 +242,6 @@ class AccountControllerTests {
                 .content(objectMapper.writeValueAsString(transferRequest)))
                 .andExpect(status().isBadRequest());
 
-        verify(transactionService, never()).performTransfer(any());
+        verify(transactionService, never()).performFrontendTransfer(any());
     }
 }

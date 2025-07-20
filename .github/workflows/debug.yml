@@ -1,0 +1,57 @@
+# Simple CI workflow for debugging
+# This workflow tests basic functionality step by step
+
+name: Debug CI
+
+on:
+  push:
+    branches: [ "develop" ]
+  pull_request:
+    branches: [ "develop" ]
+
+jobs:
+  debug-build:
+    name: Debug Build and Test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up JDK 21
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+        
+    - name: Verify environment
+      run: |
+        echo "Java version:"
+        java -version
+        echo "Maven version:"
+        mvn -version
+        echo "Project structure:"
+        ls -la
+        
+    - name: Clean and validate project
+      run: mvn clean validate -B
+      
+    - name: Compile project
+      run: mvn compile -B
+      
+    - name: Compile test sources
+      run: mvn test-compile -B
+      
+    - name: Run tests with detailed output
+      run: mvn test -B -X
+      env:
+        SPRING_PROFILES_ACTIVE: test
+      continue-on-error: true
+      
+    - name: Show test results
+      if: always()
+      run: |
+        echo "Test results:"
+        find . -name "*.xml" -path "*/surefire-reports/*" -exec cat {} \;
+        echo "Error logs:"
+        find . -name "*.log" -exec cat {} \;

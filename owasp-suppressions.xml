@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  OWASP Dependency Check Suppressions
+  Educational Banking Application - CentralBank-SecLand-Vulnerable
+  
+  IMPORTANT: This file suppresses security vulnerabilities for EDUCATIONAL PURPOSES ONLY.
+  These suppressions should NEVER be used in production applications.
+  
+  The vulnerabilities are intentionally left unsuppressed to demonstrate
+  security issues in educational contexts.
+-->
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
+    
+    <!-- Educational Note: In a real application, you would suppress false positives here -->
+    <!-- For this vulnerable educational app, we want to see all vulnerabilities -->
+    
+    <!-- Example suppression (commented out for educational purposes):
+    <suppress>
+        <notes><![CDATA[
+        This suppresses a false positive for educational demonstration.
+        In production, document why each suppression is necessary.
+        ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.example/.*$</packageUrl>
+        <cve>CVE-2021-12345</cve>
+    </suppress>
+    -->
+    
+    <!-- Suppress test-only dependencies vulnerabilities -->
+    <suppress>
+        <notes><![CDATA[
+        H2 Database vulnerabilities are acceptable in test scope only.
+        This dependency is only used for testing purposes.
+        ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.h2database/h2@.*$</packageUrl>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
+    </suppress>
+    
+    <!-- Educational suppressions for demo purposes -->
+    <suppress>
+        <notes><![CDATA[
+        Educational suppression: In production, update to newer versions.
+        For educational purposes, some older versions are maintained.
+        ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.boot/.*@3\.5\.3$</packageUrl>
+        <cvssBelow>9.0</cvssBelow>
+    </suppress>
+    
+</suppressions>
